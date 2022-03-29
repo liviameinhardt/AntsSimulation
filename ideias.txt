@@ -1,0 +1,60 @@
+1. Criar as formigas; move-las pelo mapa (grid ajustável); colonia identificada;
+2. Criar o formigueiro; Identificar quando a formiga encontra-lo
+3. Criar a comida; Identificar quando a formiga encontra-la; remove -1 pedaços da comida;
+4. Criar caminho (linha reta) do formigueiro para a comida; armazenar comida; 
+    4.1 Criar rastro de ferominio 
+    4.2 Fazer formigas perseguirem o rastro ***
+5. Criar outras colonias / pontos de comid
+6. Identificar condições de briga; Brigar; Resolver;
+
+################################
+FOMIGA:
+- colonia
+- campo de visao 
+- status: "em briga"
+    Se ferominio em campo de visao:
+        seguir traço 
+    Senão Se formiga inimiga em campo de visao:
+        brigar
+
+COLONIA:
+- posicao
+- quantidade de comida
+- qnt de formigas
+
+COMIDA:
+- posicao 
+- quantidade
+        Para pegar comida:
+            - barbeiro: para chegar na comida (esperar caso esteja cheio / sair -opcional-)
+            - bastao: para pegar a comida (o numero igual ao numero de formigas que podem pegar comida por vez)
+            - consumidor: para mudar interface dependendo do resultado
+
+GRID:
+- leitura / escrita por blocos do grid (mutex por tail -> se n der bom fazer por região)
+- (cada tail do grid é um obj que diz o que está armazenado ali)
+MAPA: struct com uma matriz de instancias da classe tail 
+classe tail (sugestão):
+    - inidice (id)
+    - tipo de elemento (feromonio, formiga, formigueiro ou comida)
+    - mutex controlador 
+
+
+BRIGA (menos foco em combate -> última coisa a ser feita):
+- qnt de formigas de cada colonia i 
+- definida pela quantidade de formigas da colonia x e y (se empatar, decisao aleatoria)
+- livre para decidir a condição de ganhar a briga
+
+################################
+
+- Tamanho do grid ajustavel  -> setado
+- Pontos de comida aleatorios (quantos?) -> setado
+- Numero de colonias ajustavel?  -> setado
+- campo de visaõ da formiga ajustavel  -> setado
+
+################################
+
+- a formiga só segue o traço do ferominio ou ela tem que seguir pra comida no primeiro contato
+*** somente formigas da msm colonia identificam os traços de ferominio?
+**  que distancia de uma briga formigas devem estar para entrar na briga?
+
