@@ -8,6 +8,7 @@
 6. Identificar condições de briga; Brigar; Resolver;
 
 ################################
+
 FOMIGA:
 - colonia
 - campo de visao 
@@ -16,11 +17,19 @@ FOMIGA:
         seguir traço 
     Senão Se formiga inimiga em campo de visao:
         brigar
+- somente formigas da msm colonia identificam os traços de ferominio? NÃO (PARA FACILITAR)
+
+
+SUGESTAO: lista de formigas para processar (estilo atividade 2):
+    - a thread seleciona a proxima formiga a ser processada (contator ou outras formas)
+        executar logica da formiga (decisão)
+            
 
 COLONIA:
 - posicao
 - quantidade de comida
 - qnt de formigas
+(MULTIPLAS COLONIAS -> SOMENTE NO FINAL NAO É O FOCO)
 
 COMIDA:
 - posicao 
@@ -30,7 +39,7 @@ COMIDA:
             - bastao: para pegar a comida (o numero igual ao numero de formigas que podem pegar comida por vez)
             - consumidor: para mudar interface dependendo do resultado
 
-GRID:
+GRID/TAILS:
 - leitura / escrita por blocos do grid (mutex por tail -> se n der bom fazer por região)
 - (cada tail do grid é um obj que diz o que está armazenado ali)
 MAPA: struct com uma matriz de instancias da classe tail 
@@ -38,7 +47,14 @@ classe tail (sugestão):
     - inidice (id)
     - tipo de elemento (feromonio, formiga, formigueiro ou comida)
     - mutex controlador 
+- sleep: somente SOMENTE para andar a formiga
 
+INTERFACE:
+    - desenhar o grid (uma linha por vez)
+    - SUGESTÃO: tail de 4 caracteres 
+    - fonte monoespacada!
+    - req secundario: tecla de pause (de desenhar o mapa)
+    - cores: depende do terminal | usar caracteres distintos para diferenciar 
 
 BRIGA (menos foco em combate -> última coisa a ser feita):
 - qnt de formigas de cada colonia i 
@@ -52,9 +68,11 @@ BRIGA (menos foco em combate -> última coisa a ser feita):
 - Numero de colonias ajustavel?  -> setado
 - campo de visaõ da formiga ajustavel  -> setado
 
+DICAS:
+ usar cache pode ser bom 
+
 ################################
 
-- a formiga só segue o traço do ferominio ou ela tem que seguir pra comida no primeiro contato
-*** somente formigas da msm colonia identificam os traços de ferominio?
-**  que distancia de uma briga formigas devem estar para entrar na briga?
-
+HORARIO DE ATENDIMENTO:
+QUARTA DE 8H AS 10H (zoom)
+email
