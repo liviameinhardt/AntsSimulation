@@ -1,0 +1,97 @@
+Classe formiga:
+- Dados
+	- Localizaçao da formiga
+
+- Anda pelo espaço aleatoriamente
+	- Haverá três sentidos: Diagonal, horizontal, vertical
+	- Quatro direções: Esquerda, Direita, Cima, Baixo
+	- Um tamanho de passo a ser definido
+
+- Visualiza os objetos em um certo "raio"
+	- Será visualizado n espaços ao redor da formiga
+
+- Ao andar com o alimento libera feromônio
+	- Será adicionado feromônio em um "raio" de n espaços ao redor da formiga
+	
+- Se ver uma formiga de outra colônia, ataca ela
+	- Libera feromônio de ataque para outras formigas
+	
+- Se ver alimento, vai coleta-lo
+	- Para coletar a comida as formigas precisam de dois bastões (Dilema dos filosofos)
+	- Se tudo estiver ocupado, a formiga segue o seu caminho( Dilema do barbeiro
+	
+
+	- Retorna para o formigueiro em linha reta.
+
+Struct UnidadeEspaço:
+	- Status de ocupação por formigas
+	- Ponteiro para o objeto formiga
+	- Status de ocupação do feromônio
+	- Ponteiro para o feromônio
+
+Class Espaço 2D:
+	- Armazena uma array com todos as unidades de espaço
+
+	- Lista de formigas
+	- Lista de feromônios
+	
+
+
+class Formigueiro:
+	- Local de onde sai e retornam formigas
+	- Formigas saem desse local seguindo um caminho aleatorio
+
+class Comida:
+	- Local no espaço que diminui de acordo com a coleta das formigas
+	- Quais estados?
+
+Espaço:
+	- Espaço 2D
+	- Uma array bidmensional
+
+Interface no terminal:
+- ???
+
+Feromômio:
+- Quais tipos?
+- Vai haver quanto tempo
+
+Unidade de espaço:
+-
+
+
+######################################################3
+Perguntas:
+- Quantos bastões estarão disponíveis?
+	- Vai ser um bastão
+	
+- Como funcionará a interface?
+
+- Como será os critérios de batalha ?
+	- Vai ser uma probabilidade de ganhar
+	- Vai ser uma probabilidade de atacar
+
+- Haverá mais de uma colônia?
+	- Sim
+
+- Vai ter mais de um bolo de comida?
+	- Sim
+
+- A formiga sabe para onde deve ir?
+	- 
+
+- Tipos de feromônio?
+
+
+################################################
+
+
+- Caminho das pedras
+	- Vai ter intervalos para varrer todo a matriz
+	- Duplicata do mapa só para leitura e representar o mapa
+	ou
+	Mutex para leitura do mapa
+	- Mutex por pixel para começar
+	- Usar cahce para leitura
+	
++
