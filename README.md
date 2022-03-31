@@ -4,8 +4,9 @@ Projeto realizado para a disciplina de computação escalável - FGV EMAp
 Curso de Ciência de Dados - 5º período
 
 ## Como organizar o projeto (dicas do professor)
-- modelo de classees
--  atributos das classes
+- abstrações
+- modelo de classes
+-  atributos e métodos das classes
 - estrutura do programa (threads e suas funções)
   - O que cada thread faz? Quais são os pontos de sincronia?
   - Quais são as regiões críticas? Como protege-las?
