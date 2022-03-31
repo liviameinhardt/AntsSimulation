@@ -11,6 +11,8 @@ Curso de Ciência de Dados - 5º período
   - O que cada thread faz? Quais são os pontos de sincronia?
   - Quais são as regiões críticas? Como protege-las?
 
+
+-> O importante do trabalho são as questões de paralelismo e multiprocessamento (como lidamos com elas). Os objetivos secundários ficam só para depois (é um a mais, nao afeta a nota.).
 -> Depois de definir tudo: o projeto já está todo desenhado, falta só implementar 
 
 
