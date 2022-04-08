@@ -3,11 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <unistd.h>
-
 #include <chrono>
 #include <thread>
 
+// include required modules 
+#include "include/ants.cpp"
+#include "include/anthill.cpp"
+#include "include/food.cpp"
+#include "include/pheromone.cpp"
+
 using namespace std;
+
 
 // Code to always update terminal
 void gotoxy(int x,int y)    
@@ -19,22 +25,6 @@ void clrscr(void)
     system("clear");
 }
 
-
-struct ant
-{
-    ant(){
-
-    }
-
-    void move(){
-        
-    }
-};
-
-struct pheromone
-{
-    /* data */
-};
 
 
 // Basic structure of the space
@@ -79,6 +69,7 @@ struct space
     
     // Matrix with space_unit
     vector<vector<space_unit>> map;
+
     // Vector to store the ants
     vector<ant> ants;
     
@@ -88,7 +79,6 @@ struct space
 
     space(int w_dimension, int h_dimension)
     {
-        
         width = w_dimension;
         heigth = h_dimension;
 
@@ -106,6 +96,7 @@ struct space
     void set_ant(int i, int j){
         map[i][j].set_ant();
     }
+    
     // Remove an ant at (i,j) position
     void remove_ant(int i, int j){
         map[i][j].remove_ant();
@@ -149,10 +140,10 @@ struct space
 
 int main(int argc, char const *argv[])
 {
-
-    space map(40, 15);
+    space map(40, 15); 
     int w_postion = 0;
     int h_postion = 0;
+
     for (int i = 0; i < 30; i++)
     {
         map.set_ant(h_postion,w_postion);
@@ -170,11 +161,7 @@ int main(int argc, char const *argv[])
         w_postion += RandW;
         h_postion += RandH;
 
-        
-
     }
-
-
     return 0;
 }
 
