@@ -45,7 +45,6 @@ struct space_unit
     // Visualization of the unit
     string visualization = " ";
 
-    // 
     void set_ant(){
         ant_number++;
     }
@@ -70,9 +69,6 @@ struct space_unit
     void remove_anthill(){
         has_anthill = false;
     }
-
-
-
     void generate_visualization(){
         if(has_anthill){
             visualization = "\033[1;41m \033[0m";
@@ -106,12 +102,10 @@ struct space
     // Space dimension
     int width;
     int heigth;
-    
     // Matrix with space_unit
     vector<vector<space_unit>> map;
-
     // Vector to store the ants
-    vector<ant> ants;
+    vector<anthill> anthills;
     // Vector to store the pheromone
     vector<pheromone> pheromones;
     // Vector to store food coordinates
@@ -131,6 +125,26 @@ struct space
             }
         }
     };
+
+    void add_anthill(int n){
+        for (int i = 0; i < n; i++)
+        {
+            anthills.push_back(*new anthill(i));
+            this->set_anthill_map(anthills[i].h_position,anthills[i].w_position);
+        }
+    }
+
+    void add_pheromone(int h_position, int w_position ){
+        pheromones.push_back(*new pheromone(h_position, w_position));
+        set_pheromone_map(h_position,w_position);
+    }
+    void add_food(int quantity){
+        foods.push_back(*new food(quantity));
+        set_food_map(
+            foods[foods.size()-1].w_position,
+            foods[foods.size()-1].h_position
+        );
+    }
     // Set an ant at (i,j) position in the space
     void set_ant_map(int i, int j){
         map[i][j].set_ant();
@@ -203,8 +217,10 @@ int main(int argc, char const *argv[])
     int w_postion = 0;
     int h_postion = 0;
 
-
-
+    map.add_anthill(1);
+    map.add_pheromone(10,20);
+    map.add_food(1000);
+    map.show_map();
 
     // map.set_food_map(10, 35);
     // map.set_anthill_map(1,1);
