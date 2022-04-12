@@ -1,18 +1,37 @@
-#include <iostream>
 #include <vector>
-#include <stdio.h>
-#include <stdlib.h> 
-#include <unistd.h>
-#include <chrono>
-#include <thread>
+#include <iostream>
 
-
+using namespace std;
 struct pheromone
 {
-    int h_position;
-    int w_position;
-    pheromone(int h_position, int w_position){
-        h_position = h_position;
-        w_position = w_position;
+    vector<int> position;
+    int life_time;
+
+    void decay_life(){
+        life_time = life_time - 1;
     }
+
+    void increase_life(int time){
+        life_time = life_time + time;
+    }
+
 };
+
+
+// Testando 
+int main()
+{
+    struct pheromone test;
+    test.life_time = 10;
+    test.decay_life();
+
+    cout << test.life_time << endl;
+
+    test.increase_life(2);
+
+    cout << test.life_time;
+
+
+    return 0;
+}
+

@@ -7,7 +7,6 @@
 #include <thread>
 
 // include required modules 
-#include "include/ants.cpp"
 #include "include/anthill.cpp"
 #include "include/food.cpp"
 #include "include/pheromone.cpp"
