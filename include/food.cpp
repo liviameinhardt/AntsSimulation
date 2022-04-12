@@ -4,28 +4,25 @@ using namespace std;
 
 struct food
 {
-    vector<int> position;
-    int quantity;
-    int id;
+    int h_position;
+    int w_position;
+    int max_quantity;
+    int current_quantity;
 
-    void decay_quantity(){
-        quantity = quantity - 1;
+    //constructor
+    food(int height,int weight,int int_quantity){
+        h_position = height;
+        w_position = weight;
+        current_quantity = int_quantity;
+        max_quantity = int_quantity;
     }
 
-    void spawn(){
+    void decay_quantity(){
+        current_quantity = current_quantity - 1;
+    }
 
-        // after spawn time has passed / quantity = 0 run this function
-
-    
-        int RandH = rand() % 2;
-        int RandW = rand() % 2;
-
-        position.push_back(RandH);
-        position.push_back(RandW);
-
-        // still need to check if new position is available
-        
-
+    void reset_quantity(){
+        current_quantity = max_quantity;        
     }
 
 

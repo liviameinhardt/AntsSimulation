@@ -4,8 +4,16 @@
 using namespace std;
 struct pheromone
 {
-    vector<int> position;
+    int h_position;
+    int w_position;
     int life_time;
+
+    // constructor
+    pheromone(int height, int weight, int life){
+        h_position = height;
+        w_position = weight;
+        life_time = life;
+    }
 
     void decay_life(){
         life_time = life_time - 1;
@@ -18,20 +26,19 @@ struct pheromone
 };
 
 
-// Testando 
-int main()
-{
-    struct pheromone test;
-    test.life_time = 10;
-    test.decay_life();
+// // Testando 
+// int main()
+// {
+//     pheromone test(10,10,4);
+//     test.decay_life();
 
-    cout << test.life_time << endl;
+//     cout << test.life_time << endl;
 
-    test.increase_life(2);
+//     test.increase_life(2);
 
-    cout << test.life_time;
+//     cout << test.life_time;
 
 
-    return 0;
-}
+//     return 0;
+// }
 

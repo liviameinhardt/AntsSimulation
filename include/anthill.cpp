@@ -5,28 +5,24 @@ using namespace std;
 
 struct anthill
 {
-  vector<int> position;
+  int h_position;
+  int w_position;
   vector<ant> ants_list;
   int id;
+
+  // constructor
+  anthill(int height,int weight, int int_id){
+    h_position = height;
+    w_position = weight;
+    id = int_id;
+  }
 
   void spawn_ants(int number_of_ants, int ant_field_vision){
 
     for(int i = 0; i <= number_of_ants; i++){
-
-      ant new_ant;
-
-      // qual será a posicao inicial da formiga?
-      new_ant.position.push_back(0); 
-      new_ant.position.push_back(0); 
-
-      new_ant.home_position = position; 
-      new_ant.field_of_vision = ant_field_vision; 
-      new_ant.status = 0; // walking around
-
+      ant new_ant(0,0,{h_position,w_position}, 5);
       ants_list.push_back(new_ant);
-
     }
-
       
   }
 
@@ -37,20 +33,3 @@ struct anthill
 
 
 };
-
-int main(){
-
-  anthill formigueiro1;
-  formigueiro1.position.push_back(0);
-  formigueiro1.position.push_back(1);
-
-  formigueiro1.spawn_ants(5,2); 
-
-   for (ant x : formigueiro1.ants_list){
-        cout << x.status << " ";
-   }
-       
-
-  
-  return 1;
-}
