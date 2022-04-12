@@ -9,5 +9,10 @@
 
 struct pheromone
 {
-    /* data */
+    int h_position;
+    int w_position;
+    pheromone(int h_position, int w_position){
+        h_position = h_position;
+        w_position = w_position;
+    }
 };
