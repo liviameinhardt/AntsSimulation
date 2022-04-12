@@ -37,6 +37,7 @@ struct space_unit
     int ant_number=0;
     bool has_pheromone = false;
     bool has_food = false;
+    bool has_colony = false;
     // Pointer to the current ant
     ant* ant_here;
     // Pointer to current pheromone
@@ -47,12 +48,10 @@ struct space_unit
     // 
     void set_ant(){
         ant_number++;
-        visualization = "*";
     }
 
     void remove_ant(){
         ant_number--;
-        visualization = " ";
     }
 
     void set_pheromone(){
@@ -68,6 +67,13 @@ struct space_unit
     void remove_food(){
         has_food = false;
     }
+    void set_colony(){
+        has_colony = true;
+    }
+    void remove_colony(){
+        has_colony = false;
+    }
+
 
 
     void generate_visualization(){
@@ -77,11 +83,15 @@ struct space_unit
         }
         else if ((ant_number>0))
         {
-            visualization = "\033[1;36m*\033[0m";
+            visualization = "\033[1;31m*\033[0m";
         }
 
         if(has_food){
             visualization = "\033[1;43m \033[0m";
+        }
+
+        if(has_colony){
+            visualization = "\033[1;41m \033[0m";
         }
     }
 
@@ -104,10 +114,8 @@ struct space
 
     // Vector to store the ants
     vector<ant> ants;
-    
     // Vector to store the pheromone
     vector<pheromone> pheromones;
-
     // Vector to store food coordinates
     vector<food> foods;
 
@@ -149,6 +157,14 @@ struct space
     void remove_food(int i, int j){
         map[i][j].remove_food();
     }
+
+    void set_colony(int i, int j){
+        map[i][j].set_colony();
+    }
+    void remove_colony(int i, int j){
+        map[i][j].remove_colony();
+    }
+    
     void show_map(){
         // Lines to clear the teminal
         int x=0, y=10;
@@ -179,7 +195,6 @@ struct space
         {
             cout << "#";
         }
-        
         cout << "\n";
 
     }
@@ -191,6 +206,7 @@ int main(int argc, char const *argv[])
     int w_postion = 0;
     int h_postion = 0;
     map.set_food(10, 35);
+    map.set_colony(1,1);
 
     for (int i = 0; i < 15; i++)
     {
