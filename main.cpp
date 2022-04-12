@@ -37,7 +37,7 @@ struct space_unit
     int ant_number=0;
     bool has_pheromone = false;
     bool has_food = false;
-    bool has_colony = false;
+    bool has_anthill = false;
     // Pointer to the current ant
     ant* ant_here;
     // Pointer to current pheromone
@@ -49,35 +49,38 @@ struct space_unit
     void set_ant(){
         ant_number++;
     }
-
     void remove_ant(){
         ant_number--;
     }
-
     void set_pheromone(){
         has_pheromone = true;
     }
     void remove_pheromone(){
         has_pheromone = false;
     }
-
     void set_food(){
         has_food = true;
     }
     void remove_food(){
         has_food = false;
     }
-    void set_colony(){
-        has_colony = true;
+    void set_anthill(){
+        has_anthill = true;
     }
-    void remove_colony(){
-        has_colony = false;
+    void remove_anthill(){
+        has_anthill = false;
     }
 
 
 
     void generate_visualization(){
-        if ((ant_number==0)&(has_pheromone))
+        if(has_anthill){
+            visualization = "\033[1;41m \033[0m";
+        }
+        else if(has_food){
+            visualization = "\033[1;43m \033[0m";
+        }
+        else if ((ant_number==0)&(has_pheromone))
         {
             visualization = "\033[1;35m•\033[0m";
         }
@@ -85,13 +88,8 @@ struct space_unit
         {
             visualization = "\033[1;31m*\033[0m";
         }
-
-        if(has_food){
-            visualization = "\033[1;43m \033[0m";
-        }
-
-        if(has_colony){
-            visualization = "\033[1;41m \033[0m";
+        else{
+            visualization = " ";
         }
     }
 
@@ -133,36 +131,35 @@ struct space
             }
         }
     };
-
     // Set an ant at (i,j) position in the space
-    void set_ant(int i, int j){
+    void set_ant_map(int i, int j){
         map[i][j].set_ant();
     }
     
     // Remove an ant at (i,j) position
-    void remove_ant(int i, int j){
+    void remove_ant_map(int i, int j){
         map[i][j].remove_ant();
     }
 
-    void set_pheromone(int i, int j){
+    void set_pheromone_map(int i, int j){
         map[i][j].set_pheromone();
     }
-    void remove_pheromone(int i, int j){
+    void remove_pheromone_map(int i, int j){
         map[i][j].remove_pheromone();
     }
 
-    void set_food(int i, int j){
+    void set_food_map(int i, int j){
         map[i][j].set_food();
     }
-    void remove_food(int i, int j){
+    void remove_food_map(int i, int j){
         map[i][j].remove_food();
     }
 
-    void set_colony(int i, int j){
-        map[i][j].set_colony();
+    void set_anthill_map(int i, int j){
+        map[i][j].set_anthill();
     }
-    void remove_colony(int i, int j){
-        map[i][j].remove_colony();
+    void remove_anthill_map(int i, int j){
+        map[i][j].remove_anthill();
     }
     
     void show_map(){
@@ -205,27 +202,31 @@ int main(int argc, char const *argv[])
     space map(15, 40); 
     int w_postion = 0;
     int h_postion = 0;
-    map.set_food(10, 35);
-    map.set_colony(1,1);
 
-    for (int i = 0; i < 15; i++)
-    {
-        map.set_ant(h_postion,w_postion);
-        map.show_map();
+
+
+
+    // map.set_food_map(10, 35);
+    // map.set_anthill_map(1,1);
+
+    // for (int i = 0; i < 15; i++)
+    // {
+    //     map.set_ant_map(h_postion,w_postion);
+    //     map.show_map();
         
-        // Sleep in miliseconds
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        map.set_pheromone(i,i);
-        map.remove_ant(h_postion,w_postion);
+    //     // Sleep in miliseconds
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    //     map.set_pheromone_map(i,i);
+    //     map.remove_ant_map(h_postion,w_postion);
 
-        // Generating random number
-        int RandW = rand() % 2;
-        int RandH = rand() % 2;
+    //     // Generating random number
+    //     int RandW = rand() % 2;
+    //     int RandH = rand() % 2;
         
-        w_postion += RandW;
-        h_postion += RandH;
+    //     w_postion += RandW;
+    //     h_postion += RandH;
 
-    }
+    // }
     return 0;
 }
 
