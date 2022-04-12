@@ -38,10 +38,11 @@ struct space_unit
     bool has_pheromone = false;
     bool has_food = false;
     bool has_anthill = false;
-    // Pointer to the current ant
-    ant* ant_here;
     // Pointer to current pheromone
     pheromone* pheromone_here;
+    food* food_here;
+    anthill* anthill_here;
+    
     // Visualization of the unit
     string visualization = " ";
 
@@ -126,24 +127,37 @@ struct space
         }
     };
 
-    void add_anthill(int n){
-        for (int i = 0; i < n; i++)
+    void add_anthill(int number_anthills){
+        for (int i = 0; i < number_anthills; i++)
         {
             anthills.push_back(*new anthill(i));
-            this->set_anthill_map(anthills[i].h_position,anthills[i].w_position);
+
+            int h_position = anthills[i].h_position;
+            int w_position = anthills[i].w_position;
+            // Adding anthill pointer
+            map[h_position][w_position].anthill_here = &anthills[i];
+            this->set_anthill_map(h_position,w_position);
         }
     }
 
+    // Add pheromone entity to vector and add to map
     void add_pheromone(int h_position, int w_position ){
         pheromones.push_back(*new pheromone(h_position, w_position));
+        // Adding pheromone pointer
+        map[h_position][w_position].pheromone_here = &pheromones[pheromones.size()-1];
         set_pheromone_map(h_position,w_position);
     }
+    // Add food entity to vector and add to map
     void add_food(int quantity){
         foods.push_back(*new food(quantity));
-        set_food_map(
-            foods[foods.size()-1].w_position,
-            foods[foods.size()-1].h_position
-        );
+        int size_vector = foods.size();
+        int w_position = foods[size_vector-1].w_position;
+        int h_position = foods[size_vector-1].h_position;
+        // Adding food pointer
+        map[h_position][w_position].food_here = &foods[size_vector-1];
+        
+        set_food_map(h_position,w_position);
+
     }
     // Set an ant at (i,j) position in the space
     void set_ant_map(int i, int j){
@@ -154,28 +168,30 @@ struct space
     void remove_ant_map(int i, int j){
         map[i][j].remove_ant();
     }
-
+    // Set pheromone to terminal visualizationat position (i,j)
     void set_pheromone_map(int i, int j){
         map[i][j].set_pheromone();
     }
+    // Remove a pheromone at (i,j) position
     void remove_pheromone_map(int i, int j){
         map[i][j].remove_pheromone();
     }
-
+    // Set food to terminal visualization at position (i,j)
     void set_food_map(int i, int j){
         map[i][j].set_food();
     }
     void remove_food_map(int i, int j){
         map[i][j].remove_food();
     }
-
+    // Set anthill to terminal visualization at position (i,j)
     void set_anthill_map(int i, int j){
         map[i][j].set_anthill();
     }
+    // Remove an anthill at (i,j) position
     void remove_anthill_map(int i, int j){
         map[i][j].remove_anthill();
     }
-    
+    // Update the terminal
     void show_map(){
         // Lines to clear the teminal
         int x=0, y=10;
