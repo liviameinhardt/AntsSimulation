@@ -26,6 +26,8 @@ struct space_unit
     int pheromone_life = 0;
     bool has_food = false;
     bool has_anthill = false;
+    int w_pheromone_food_direction;
+    int h_pheromone_food_direction;
     // ARRUMAR AQUI DEPOIS
 
     // Visualization of the unit
@@ -37,7 +39,12 @@ struct space_unit
     void decay_pheromone() { 
         if (pheromone_life > 0){   
             pheromone_life--;
-        }}
+        }
+        if(pheromone_life == 0 ){
+            h_pheromone_food_direction= 0 ;
+            w_pheromone_food_direction= 0;
+        }
+        }
     void set_food() { has_food = true; }
     void remove_food() { has_food = false; }
     void set_anthill() { has_anthill = true; }
@@ -220,9 +227,9 @@ struct ant
                     pheromone_position.push_back(j);
                     following_pheoromone = true;
                 }
-                else{
-                    following_pheoromone = false;
-                }
+                // else{
+                //     following_pheoromone = false;
+                // }
             }
 
             // cout << endl;
@@ -295,18 +302,24 @@ struct ant
         // Removing ant from current position
         (*current_map).remove_ant_map(h_position,w_position);
         // Updating position
-        if(w_home_direction > 0){
-            w_position+=1;
-        }
-        else if(w_home_direction<0){
+        if(w_home_direction<0){
             w_position-=1;
+            (*current_map).map[h_position][w_position].w_pheromone_food_direction = 1;
         }
-        if(h_home_direction > 0){
-            h_position+=1;
+        else if(w_home_direction > 0){
+            w_position+=1;
+            (*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;
         }
-        else if(h_home_direction < 0){
+        
+        if(h_home_direction < 0){
             h_position-=1;
+            (*current_map).map[h_position][w_position].h_pheromone_food_direction = 1;
         }
+        else if(h_home_direction > 0){
+            h_position+=1;
+            (*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;
+        }
+        
         if(h_home_direction==0 && w_home_direction==0){
             dropping = false;
             saw_food = false;
@@ -315,12 +328,34 @@ struct ant
 
     void go_pheromone(){
         cout << "Go to pheromone" << endl;
+        int w_phero_direction = pheromone_position[1]-w_position;
+        int h_phero_direction = pheromone_position[0]-h_position;
+        (*current_map).remove_ant_map(h_position, w_position);
+        if(w_phero_direction!=0 && h_phero_direction!=0){
+
+        if(w_phero_direction<0){
+            w_position -= 1;
+        }
+        else if(w_phero_direction>0){
+            w_position += 1;
+        }
+        if(h_phero_direction<0){
+            h_position -= 1;
+        }
+        else if(h_phero_direction>0){
+            h_position += 1;
+        }
+        }else{
+            w_position += (*current_map).map[w_position][h_position].w_pheromone_food_direction;
+            h_position += (*current_map).map[w_position][h_position].h_pheromone_food_direction;
+        }
+        (*current_map).set_ant_map(h_position, w_position);
     }
 
     void move()
     {
         see_around();
-        
+        // (*current_map).remove_ant_map(h_position, w_position);
         if(saw_food && !dropping){
             go_food();
         }
@@ -336,11 +371,12 @@ struct ant
          if (dropping){
             drop_pheromone();
         } 
+        // (*current_map).set_ant_map(h_position, w_position);
     }
 
     void drop_pheromone()
     {
-        int quanity = 35;
+        int quanity = 100;
         (*current_map).set_pheromone_map(h_position,w_position, quanity);
     }
 };

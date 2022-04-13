@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
     anthill sauvas(2,2,0,2,5, &map);
     
     // map.show_map();
-    food bolo(7,20, 10, &map);
+    food bolo(7,20, 2, &map);
     // food chocolate(2,2, 1, &map);
     // map.show_map();
 
