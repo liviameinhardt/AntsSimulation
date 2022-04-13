@@ -1,59 +1,38 @@
-// #include "include/map.cpp"
-// #include "include/ants.cpp"
-// #include "include/anthill.cpp"
-// #include "include/food.cpp"
-// #include "include/pheromone.cpp"
 #include "include/structures.cpp"
 #include <chrono>
 #include <thread>
-struct pointer_test
-{
-    pointer_test(space *map){
-        // (*map).set_food_map(1,2);
-        (*map).show_map();
-    }
-};
 
-
+ 
 int main(int argc, char const *argv[])
 {
+    // ****************** INICIALIZATION ******************
 
-    // ****************** PROGRAM ******************
-    // int num_threads = 1;
-    int map_h = 30;
-    int map_w = 30;
-    vector<anthill> anthills; // Vector to store the anthills
-    vector<pheromone> pheromones; // Vector to store the pheromone
-    vector<food> foods; // Vector to store food coordinates
+    // program entry
+    int num_threads = 1; //Número de threads a ser utilizada
+    int map_h = 15; //Dimensão do mapa altura
+    int map_w = 15;//Dimensão do mapa largura
+    int simulation_time = 120; //Tempo da simulação (em segundos)
+    int pheromone_timelife = 30; //Tempo de vida de um ferominio (em segundos)
+    int ant_field_of_vision = 1; //Campo de visão da formiga
+    int max_ants_food = 5; //Número máximo de fomigas que podem coletar comida concorrentemente
+ 
+    vector<int> ants_info ={5,ant_field_of_vision}; //only one anthill for now
+    vector<int> anthill_info = {0, 0}; //Posição do formigueiro (coluna_indice, linha_indice) e quantidade de formigas 
+    vector<vector<int>> food_info = {{12, 45,100,30}}; // Posição da fonte de comida; posição; quantidade inicial; taxa de reposição 
+    
+    // create structures
     space map(map_h, map_w);
-    
-    
-    anthill sauvas(2,2,0,2, &map);
-    
-    // map.show_map();
+    anthill sauvas(2,2,0,2,pheromone_timelife, &map);
     food bolo(4,3, 1, &map);
-    // food chocolate(2,2, 1, &map);
-    // map.show_map();
 
-    // ant first_ant({9,19},1, &map);
-    // first_ant.see_around();
+    // ****************** RUN MULTITHREAD PROGRAM ******************
     while (true)
     {
-        // first_ant.move();
         sauvas.ant_moves();
         map.show_map();
         bolo.update();
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    
-
-    // int pheromone_timelife = 30;
-    // int ant_field_of_vision = 1;
-    // vector<vector<int>> ants_info ={{5,ant_field_of_vision}};
-    // vector<vector<int>> anthill_info = {{0, 0}};
-    // vector<vector<int>> food_info = {{12, 45,100,30}}; // position, quantity, taxa_rep
-    // int max_ants_food = 5;
-
 
     return 0;
 }
