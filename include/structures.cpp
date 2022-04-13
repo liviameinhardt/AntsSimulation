@@ -6,7 +6,6 @@
 #include <iostream>
 using namespace std;
 
-// Code to always update terminal
 void gotoxy(int x, int y) { printf("%c[%d;%df", 0x1B, y, x); }
 void clrscr(void) { system("clear"); }
 int rand_between(int start, int final)
@@ -208,7 +207,9 @@ struct ant
     // Indicate fi already saw food
     bool saw_food = false;
     bool going_home = false;
-    
+    bool dropping = false;
+
+
     ant(vector<int> home, int field, space *map)
     {
         h_position = home[0];
@@ -258,25 +259,7 @@ struct ant
         // (*current_map)
     }
 
-    int move()
-    {
-        // if(!saw_food){
-        //     saw_food = see_around();
-        //     // Ainda falta definir a movimentação até a comida
-        // }
-        // cout << (*current_map).map[h_position][w_position].has_food;
-        
-        if((*current_map).map[h_position][w_position].has_food ){
-            going_home =true;
-        }
-        
-        if(going_home){
-            go_home();
-            // cout << "indo pra casa" << endl;
-            // break;
-            return 0;
-        }
-
+    void walk_randomly(){
         // Tem 1/5 de chance da formiga rever a direção que está seguindo
         if(rand_between(1,5)<2){
             w_direction = rand_between(1,3)-2;
@@ -298,13 +281,34 @@ struct ant
         
         w_position += w_direction;
         h_position += h_direction;
+    }
+
+    int move()
+    {
+        // if(!saw_food){
+        //     saw_food = see_around();
+        //     // Ainda falta definir a movimentação até a comida
+        // }
+        // cout << (*current_map).map[h_position][w_position].has_food;
+
+        walk_randomly();
+
+        if((*current_map).map[h_position][w_position].has_food ){
+            cout << "FOOOOD";
+            dropping = true;
+        }
+        
         (*current_map).set_ant_map(h_position, w_position);
+
+         if (dropping){
+            (*current_map).set_pheromone_map(h_position,w_position);
+        }
+
         return 0;
     }
 
-    void get_food()
-    {
-
+    void get_food(){
+        dropping = true;
     }
 
     void go_home()
@@ -455,7 +459,3 @@ struct pheromone
     }
 };
 
-// int main()
-// {
-//     return 0;
-// }

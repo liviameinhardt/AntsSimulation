@@ -20,19 +20,18 @@ int main(int argc, char const *argv[])
 
     // ****************** PROGRAM ******************
     // int num_threads = 1;
-    int map_h = 5;
-    int map_w = 10;
+    int map_h = 30;
+    int map_w = 30;
     vector<anthill> anthills; // Vector to store the anthills
     vector<pheromone> pheromones; // Vector to store the pheromone
     vector<food> foods; // Vector to store food coordinates
     space map(map_h, map_w);
     
     
-    anthill sauvas(2,2,0,1, &map);
+    anthill sauvas(2,2,0,2, &map);
     
     // map.show_map();
     food bolo(4,3, 1, &map);
-    food pudim(3,4, 1, &map);
     // food chocolate(2,2, 1, &map);
     // map.show_map();
 
@@ -47,10 +46,6 @@ int main(int argc, char const *argv[])
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     
-    
-
-  
-
 
     // int pheromone_timelife = 30;
     // int ant_field_of_vision = 1;
@@ -62,4 +57,3 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
-
