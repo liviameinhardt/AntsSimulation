@@ -167,10 +167,12 @@ struct ant
     int w_direction;
     int h_direction;
     vector<int> food_position;
+    vector<int> pheromone_position;
     // Indicate fi already saw food
     bool saw_food = false;
     bool going_home = false;
     bool dropping = false;
+    bool following_pheoromone = false;
 
 
     ant(vector<int> home, int field, space *map)
@@ -210,10 +212,19 @@ struct ant
                 if((*current_map).map[i][j].has_food){
                     food_position.push_back(i);
                     food_position.push_back(j);
-                    // return (true);
                     saw_food = true;
                 }
+
+                if((*current_map).map[i][j].pheromone_life>0){
+                    pheromone_position.push_back(i);
+                    pheromone_position.push_back(j);
+                    following_pheoromone = true;
+                }
+                else{
+                    following_pheoromone = false;
+                }
             }
+
             // cout << endl;
         }
         // return(false);
@@ -302,6 +313,9 @@ struct ant
         }
     }
 
+    void go_pheromone(){
+        cout << "Go to pheromone" << endl;
+    }
 
     void move()
     {
@@ -313,6 +327,9 @@ struct ant
         else if(dropping){
             go_home();
         }
+        else if(following_pheoromone){
+            go_pheromone();
+        }
         else{
             walk_randomly();
         }
@@ -323,7 +340,7 @@ struct ant
 
     void drop_pheromone()
     {
-        int quanity = 15;
+        int quanity = 35;
         (*current_map).set_pheromone_map(h_position,w_position, quanity);
     }
 };
