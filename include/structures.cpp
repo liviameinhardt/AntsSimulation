@@ -1,6 +1,9 @@
 #include <vector>
 #include <iostream>
 #include <random>
+#include <cstdlib>
+#include <string>
+#include <iostream>
 using namespace std;
 
 // Code to always update terminal
@@ -25,10 +28,6 @@ struct space_unit
     bool has_food = false;
     bool has_anthill = false;
     // ARRUMAR AQUI DEPOIS
-    // // Pointer to current pheromone
-    // pheromone* pheromone_here;
-    // food* food_here;
-    // anthill* anthill_here;
 
     // Visualization of the unit
     string visualization = " ";
@@ -205,6 +204,11 @@ struct ant
     space *current_map;
     int w_direction;
     int h_direction;
+    vector<int> food_position;
+    // Indicate fi already saw food
+    bool saw_food = false;
+    bool going_home = false;
+    
     ant(vector<int> home, int field, space *map)
     {
         h_position = home[0];
@@ -221,12 +225,58 @@ struct ant
         h_direction = rand_between(1,3)-2;
     }
 
-    void see_around()
+    bool see_around()
     {
+        // Square area vision
+        int w_start = w_position-field_of_vision;
+        int h_start = h_position-field_of_vision;
+        // Rever caso as formigas não vejam as extremidades
+        if(w_start<=0){w_start = 0;};
+        if(h_start<=0){h_start = 0;};
+        int w_final = w_position+field_of_vision;
+        int h_final = h_position+field_of_vision;
+        // Rever caso as formigas não vejam as extremidades
+        if(w_final>=(*current_map).width){w_final = (*current_map).width-1;}
+        if(h_final>=(*current_map).height){h_final = (*current_map).height-1;}
+        // Food sense
+        // cout << "upper corner:" << w_start << "," << h_start << endl;
+        // cout << "upper corner:" << w_final << "," << h_final << endl;
+        for (int i = h_start; i <= h_final; i++)
+        {
+            for (int j = w_start; j <= w_final; j++)
+            {
+                // cout << "("<<j<<","<<i<<")";
+                if((*current_map).map[i][j].has_food){
+                    food_position.push_back(i);
+                    food_position.push_back(j);
+                    return (true);
+                }
+            }
+            // cout << endl;
+        }
+        return(false);
+        // (*current_map)
     }
 
-    void move()
+    int move()
     {
+        // if(!saw_food){
+        //     saw_food = see_around();
+        //     // Ainda falta definir a movimentação até a comida
+        // }
+        // cout << (*current_map).map[h_position][w_position].has_food;
+        
+        if((*current_map).map[h_position][w_position].has_food ){
+            going_home =true;
+        }
+        
+        if(going_home){
+            go_home();
+            // cout << "indo pra casa" << endl;
+            // break;
+            return 0;
+        }
+
         // Tem 1/5 de chance da formiga rever a direção que está seguindo
         if(rand_between(1,5)<2){
             w_direction = rand_between(1,3)-2;
@@ -238,31 +288,59 @@ struct ant
         (*current_map).remove_ant_map(h_position, w_position);
 
         // if touch the wall change the direction
-        if((w_position+w_direction)>=(*current_map).width || (w_position+w_direction)<=0){
+        if((w_position+w_direction)>=(*current_map).width || (w_position+w_direction)<0){
             w_direction = -w_direction;    
         }
         
-        if((h_position+h_direction)>=(*current_map).height || (h_position+h_direction)<=0){
+        if((h_position+h_direction)>=(*current_map).height || (h_position+h_direction)<0){
             h_direction = -h_direction;    
         }
-
+        
         w_position += w_direction;
         h_position += h_direction;
         (*current_map).set_ant_map(h_position, w_position);
+        return 0;
     }
 
     void get_food()
     {
+
     }
 
     void go_home()
     {
+        // incompleto
+        w_direction = w_position-home_position[1];
+        
+        h_direction = h_position-home_position[0];
+
+        (*current_map).remove_ant_map(h_position,w_position);
+        if(w_direction > 0){
+            w_position -= w_direction;
+        }
+        else{
+            w_position += w_direction;
+        }
+        if(h_direction > 0){
+            h_position -= h_direction;
+        }
+        if(h_direction < 0){
+            h_position += h_direction;
+        }
+        
+
+        (*current_map).set_pheromone_map(h_position,w_position);
+
+        if (w_position==home_position[1] && h_position==home_position[0]){
+            going_home = false;
+        }
     }
 
     void drop_pheromone()
     {
     }
 };
+
 struct anthill
 {
     int h_position;
@@ -323,7 +401,7 @@ struct food
         // Por enquanto, para cada formiga na posição da comida, há um decréscimo da comida
         for (int i = 0; i < (*current_map).map[h_position][w_position].ant_number; i++)
         {
-            current_quantity -= 1;
+            decay_quantity();
             // Se a comida acabar
             if(current_quantity<=0){
                 
@@ -334,7 +412,7 @@ struct food
                 w_position = rand_between(1,(*current_map).width-1);
                 (*current_map).set_food_map(h_position,w_position);
                 // A quantidade é atualizada
-                current_quantity = max_quantity;
+                reset_quantity();
                 break;
             }
         }

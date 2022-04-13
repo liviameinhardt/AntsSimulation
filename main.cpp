@@ -20,21 +20,24 @@ int main(int argc, char const *argv[])
 
     // ****************** PROGRAM ******************
     // int num_threads = 1;
-    int map_h = 15;
-    int map_w = 50;
+    int map_h = 5;
+    int map_w = 10;
     vector<anthill> anthills; // Vector to store the anthills
     vector<pheromone> pheromones; // Vector to store the pheromone
     vector<food> foods; // Vector to store food coordinates
     space map(map_h, map_w);
     
     
-    anthill sauvas(2,2,0,10, &map);
+    anthill sauvas(2,2,0,1, &map);
+    
     // map.show_map();
-    food bolo(10,20, 1, &map);
+    food bolo(4,3, 1, &map);
+    food pudim(3,4, 1, &map);
+    // food chocolate(2,2, 1, &map);
+    // map.show_map();
 
-    map.show_map();
-
-    // ant first_ant({0,0},1, &map);
+    // ant first_ant({9,19},1, &map);
+    // first_ant.see_around();
     while (true)
     {
         // first_ant.move();
