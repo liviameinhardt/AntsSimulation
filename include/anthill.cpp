@@ -18,7 +18,6 @@ struct anthill
   }
 
   void spawn_ants(int number_of_ants, int ant_field_vision){
-
     for(int i = 0; i <= number_of_ants; i++){
       ant new_ant(0,0,{h_position,w_position}, 5);
       ants_list.push_back(new_ant);
@@ -26,10 +25,9 @@ struct anthill
       
   }
 
-  void next_ant(){
-
-    
-  }
+  // void next_ant(){
+    // vai dizer qual a proxima formiga a ser processada
+  //   }
 
 
 };
