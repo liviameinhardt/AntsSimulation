@@ -207,7 +207,7 @@ struct ant
     bool dropping = false;
 
 
-    ant(vector<int> home, int field, int phe_time, space *map)
+    ant(vector<int> home, int field, space *map)
     {
         h_position = home[0];
         w_position = home[1];
@@ -223,7 +223,7 @@ struct ant
         h_direction = rand_between(1,3)-2;
     }
 
-    bool see_around()
+    void see_around()
     {
         // Square area vision
         int w_start = w_position-field_of_vision;
@@ -247,7 +247,8 @@ struct ant
                 if((*current_map).map[i][j].has_food){
                     food_position.push_back(i);
                     food_position.push_back(j);
-                    return (true);
+                    // return (true);
+                    saw_food = true;
                 }
             }
             // cout << endl;
