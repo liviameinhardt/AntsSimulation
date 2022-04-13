@@ -88,7 +88,7 @@ struct space
     vector<pheromone> pheromones; // Vector to store the pheromone
     vector<food> foods; // Vector to store food coordinates
 
-    // CONSTRUCTOR
+    // ******************* CONSTRUCTOR **************************
     space(int h_dimension, int w_dimension){
         width = w_dimension;
         heigth = h_dimension;
@@ -104,7 +104,7 @@ struct space
     };
 
     // ************************************************ INICIALIZATION FUNCTIONS ************************************************
-    void add_anthill(vector<vector<int>> anthill_info){
+    void add_anthill(vector<vector<int>> anthill_info,vector<vector<int>>ants_info){
 
         for (int i = 0; i < anthill_info.size(); i++)
         {
@@ -116,6 +116,8 @@ struct space
             // Adding anthill pointer
             map[h_position][w_position].anthill_here = &anthills[i];
             this->set_anthill_map(h_position,w_position);
+
+            anthills[i].spawn_ants(ants_info[i][0],ants_info[i][1]); // create ants
         }
 
     }
@@ -125,17 +127,15 @@ struct space
         for (int i = 0; i < food_info.size(); i++){
         foods.push_back(*new food(food_info[i][0],food_info[i][1],food_info[i][2]));
 
-        int size_vector = foods.size(); 
-        int w_position = foods[size_vector-1].w_position;
-        int h_position = foods[size_vector-1].h_position;
+        int w_position = foods[i].w_position;
+        int h_position = foods[i].h_position;
 
         // Adding food pointer
-        map[h_position][w_position].food_here = &foods[size_vector-1];
+        map[h_position][w_position].food_here = &foods[i];
         set_food_map(h_position,w_position);
         
         }
     }
-
 
     //***************************************** SIMULATION FUNCTIONS ************************************************
     void add_pheromone(int h_position, int w_position, int life){
@@ -143,6 +143,7 @@ struct space
         map[h_position][w_position].pheromone_here = &pheromones[pheromones.size()-1];  // Adding pheromone pointer
         set_pheromone_map(h_position,w_position);
     }
+
 
     //***************************************** CLASS FUNCTIONS ************************************************
     void set_ant_map(int i, int j){ map[i][j].set_ant(); } // Set an ant at (i,j) position in the space
