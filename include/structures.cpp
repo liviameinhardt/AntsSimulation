@@ -279,38 +279,36 @@ struct ant
         h_position += h_direction;
     }
 
-    int move()
-    {
-        walk_randomly(); 
-
-        if((*current_map).map[h_position][w_position].has_food ){ 
-            get_food();
-        }
-
-        (*current_map).set_ant_map(h_position, w_position); 
-
-        if(dropping){
-            drop_pheromone();    
-        }
-
-        return 0;
-    }
-
-    void get_food(){
-        dropping = true;
-    }
-
-    void drop_pheromone(){
-
-         if((*current_map).map[h_position][w_position].has_anthill){ // if reached home stop dropping
-             dropping = false;
-         }
-         else{
-            if((*current_map).map[h_position][w_position].pheromone_life == 0){  // if position DOES NOT contain a pheromone    
-                // fazer a logica do pheromonio
+    void go_food(){
+        (*current_map).remove_ant_map(h_position,w_position);
+            h_direction = food_position[0]-h_position;
+            w_direction = food_position[1]-w_position;
+            if (h_direction>0)
+            {
+                h_position += 1;
             }
-           // fazer a logica do pheromonio  
-        }
+            else if(h_direction<0){
+                h_position -=1;
+            }
+            else{
+                h_position=h_position;
+            }
+            if(w_direction >0){
+                w_position +=1 ;
+            }
+            else if(w_position<0){
+                w_position -=1;
+            }
+            else{
+                w_position = w_position;
+            }
+            (*current_map).set_ant_map(h_position, w_position);
+            
+            if(w_position==food_position[1] && h_position==food_position[0]){
+                saw_food = false;
+                dropping = true;
+                food_position.clear();
+            }
     }
 
     void go_home()
