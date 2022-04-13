@@ -11,7 +11,6 @@
 #include "pheromone.cpp"
 
 
-
 // Code to always update terminal
 void gotoxy(int x,int y){printf("%c[%d;%df",0x1B,y,x);}
 void clrscr(void){ system("clear"); }
@@ -84,20 +83,13 @@ struct space
     int width;
     int heigth;
 
-    // Matrix with space_unit
-    vector<vector<space_unit>> map;
+    vector<vector<space_unit>> map; // Matrix with space_unit
+    vector<anthill> anthills; // Vector to store the anthills
+    vector<pheromone> pheromones; // Vector to store the pheromone
+    vector<food> foods; // Vector to store food coordinates
 
-    // Vector to store the ants
-    vector<anthill> anthills;
-
-    // Vector to store the pheromone
-    vector<pheromone> pheromones;
-
-    // Vector to store food coordinates
-    vector<food> foods;
-
-    space(int h_dimension, int w_dimension)
-    {
+    // CONSTRUCTOR
+    space(int h_dimension, int w_dimension){
         width = w_dimension;
         heigth = h_dimension;
 
@@ -111,8 +103,7 @@ struct space
         }
     };
 
-
-    // passar so um vetor de vetores com informações //
+    // ************************************************ INICIALIZATION FUNCTIONS ************************************************
     void add_anthill(vector<vector<int>> anthill_info){
 
         for (int i = 0; i < anthill_info.size(); i++)
@@ -129,26 +120,12 @@ struct space
 
     }
 
-    // Add pheromone entity to vector and add to map
-    void add_pheromone(int h_position, int w_position, int life){
-
-        pheromones.push_back(*new pheromone(h_position, w_position,life));
-
-        // Adding pheromone pointer
-        map[h_position][w_position].pheromone_here = &pheromones[pheromones.size()-1];
-        set_pheromone_map(h_position,w_position);
-
-    }
-
-    // Add food entity to vector and add to map
     void add_food(vector<vector<int>> food_info){
 
-        for (int i = 0; i < food_info.size(); i++)
-        {
-
+        for (int i = 0; i < food_info.size(); i++){
         foods.push_back(*new food(food_info[i][0],food_info[i][1],food_info[i][2]));
 
-        int size_vector = foods.size(); // ?
+        int size_vector = foods.size(); 
         int w_position = foods[size_vector-1].w_position;
         int h_position = foods[size_vector-1].h_position;
 
@@ -159,30 +136,27 @@ struct space
         }
     }
 
-    // Set an ant at (i,j) position in the space
-    void set_ant_map(int i, int j){ map[i][j].set_ant(); }
-    
-    // Remove an ant at (i,j) position
-    void remove_ant_map(int i, int j){ map[i][j].remove_ant();}
 
-    // Set pheromone to terminal visualizationat position (i,j)
-    void set_pheromone_map(int i, int j){ map[i][j].set_pheromone();}
+    //***************************************** SIMULATION FUNCTIONS ************************************************
+    void add_pheromone(int h_position, int w_position, int life){
+        pheromones.push_back(*new pheromone(h_position, w_position,life));
+        map[h_position][w_position].pheromone_here = &pheromones[pheromones.size()-1];  // Adding pheromone pointer
+        set_pheromone_map(h_position,w_position);
+    }
 
-    // Remove a pheromone at (i,j) position
-    void remove_pheromone_map(int i, int j){ map[i][j].remove_pheromone();}
-
-    // Set food to terminal visualization at position (i,j)
-    void set_food_map(int i, int j){ map[i][j].set_food();}
-
+    //***************************************** CLASS FUNCTIONS ************************************************
+    void set_ant_map(int i, int j){ map[i][j].set_ant(); } // Set an ant at (i,j) position in the space
+    void remove_ant_map(int i, int j){ map[i][j].remove_ant();} // Remove an ant at (i,j) position
+    void set_pheromone_map(int i, int j){ map[i][j].set_pheromone();}  // Set pheromone to terminal visualizationat position (i,j)
+    void remove_pheromone_map(int i, int j){ map[i][j].remove_pheromone();} // Remove a pheromone at (i,j) position
+    void set_food_map(int i, int j){ map[i][j].set_food();} // Set food to terminal visualization at position (i,j)
     void remove_food_map(int i, int j){ map[i][j].remove_food();}
+    void set_anthill_map(int i, int j){ map[i][j].set_anthill();} // Set anthill to terminal visualization at position (i,j)
+    void remove_anthill_map(int i, int j){map[i][j].remove_anthill();} // Remove an anthill at (i,j) position
 
-    // Set anthill to terminal visualization at position (i,j)
-    void set_anthill_map(int i, int j){ map[i][j].set_anthill();}
 
-    // Remove an anthill at (i,j) position
-    void remove_anthill_map(int i, int j){map[i][j].remove_anthill();}
 
-    // Update the terminal
+    // //***************************************** Update the terminal //*****************************************
     void show_map(){
 
         // Lines to clear the teminal

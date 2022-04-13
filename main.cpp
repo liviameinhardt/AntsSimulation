@@ -33,6 +33,7 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < 10; i++)
     {
         map.set_ant_map(h_postion,w_postion);
+        map.set_ant_map(h_postion-1,w_postion-1);
         map.show_map();
         
         // Sleep in miliseconds
