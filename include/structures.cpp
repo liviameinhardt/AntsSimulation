@@ -356,21 +356,20 @@ struct anthill
     vector<ant> ants_list;
     int id;
     space *current_map;
-    // constructor
-    anthill(int i, int j, int int_id,int number_of_ants,int pheromone_life, space *map)
+    anthill(int i, int j, int int_id,int number_of_ants, int field_vision, space *map)
     {
         h_position = i;
         w_position = j;
         id = int_id;
         current_map = map;
         (*map).set_anthill_map(i,j);
-        spawn_ants(number_of_ants,1,pheromone_life);
+        spawn_ants(number_of_ants, field_vision);
     }
     
-    void spawn_ants(int number_of_ants, int ant_field_vision,int phe_life)
+    void spawn_ants(int number_of_ants, int ant_field_vision)
     {
         for(int i = 0; i < number_of_ants; i++){
-          ant new_ant({h_position,w_position}, 1, phe_life,current_map);
+          ant new_ant({h_position,w_position}, ant_field_vision, current_map);
           ants_list.push_back(new_ant);
         }
     }
