@@ -315,25 +315,29 @@ struct ant
 
     void go_home()
     {
-        // incompleto
-        w_direction = w_position-home_position[1];
-        
-        h_direction = h_position-home_position[0];
-
+        int w_home_direction = home_position[1]-w_position; 
+        int h_home_direction = home_position[0]-h_position;
+        // Removing ant from current position
         (*current_map).remove_ant_map(h_position,w_position);
-        if(w_direction > 0){
-            w_position -= w_direction;
+        // Updating position
+        if(w_home_direction > 0){
+            w_position+=1;
         }
-        else{
-            w_position += w_direction;
+        else if(w_home_direction<0){
+            w_position-=1;
         }
-        if(h_direction > 0){
-            h_position -= h_direction;
+        if(h_home_direction > 0){
+            h_position+=1;
         }
-        if(h_direction < 0){
-            h_position += h_direction;
+        else if(h_home_direction < 0){
+            h_position-=1;
         }
-        
+        if(h_home_direction==0 && w_home_direction==0){
+            dropping = false;
+            saw_food = false;
+        }
+    }
+
 
         // (*current_map).set_pheromone_map(h_position,w_position);
 
