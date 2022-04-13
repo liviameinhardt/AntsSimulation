@@ -32,6 +32,11 @@ struct space_unit
 
     void set_ant() { ant_number++; }
     void remove_ant() { ant_number--; }
+    void set_pheromone(int quantity) { pheromone_life=quantity ; }
+    void decay_pheromone() { 
+        if (pheromone_life > 0){   
+            pheromone_life--;
+        }}
     void set_food() { has_food = true; }
     void remove_food() { has_food = false; }
     void set_anthill() { has_anthill = true; }
@@ -51,7 +56,11 @@ struct space_unit
             visualization = "\033[1;43m \033[0m";
             // visualization = "O";
         }
-        else if ((ant_number == 0) & (pheromone_life > 0))
+        else if (ant_number > 0)
+        {
+            visualization = "\033[1;31m*\033[0m";
+        }  
+        else if (pheromone_life > 0)
         {
             visualization = "\033[1;35m•\033[0m";
 
@@ -103,11 +112,8 @@ struct space
     //***************************************** CLASS FUNCTIONS ************************************************
     void set_ant_map(int i, int j) { map[i][j].set_ant(); }                   // Set an ant at (i,j) position in the space
     void remove_ant_map(int i, int j) { map[i][j].remove_ant(); }             // Remove an ant at (i,j) position
-    // void set_pheromone_map(int i, int j) { map[i][j].set_pheromone(); }       // Set pheromone to terminal visualizationat position (i,j)
-    // void remove_pheromone_map(int i, int j) { map[i][j].remove_pheromone(); } // Remove a pheromone at (i,j) position
- 
-    void reset_pheromone(int i, int j, int life){map[i][j].reset_life(life);}
-
+    void set_pheromone_map(int i, int j, int quantity) { map[i][j].set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
+    void decay_pheromone_map(int i, int j) { map[i][j].decay_pheromone(); } // Remove a pheromone at (i,j) position
     void set_food_map(int i, int j) { map[i][j].set_food(); }                 // Set food to terminal visualization at position (i,j)
     void remove_food_map(int i, int j) { map[i][j].remove_food(); }
     void set_anthill_map(int i, int j) { map[i][j].set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
@@ -335,7 +341,11 @@ struct ant
         }
     }
 
-   
+    void drop_pheromone()
+    {
+        int quanity = 15;
+        (*current_map).set_pheromone_map(h_position,w_position, quanity);
+    }
 };
 
 struct anthill
@@ -422,5 +432,25 @@ struct food
         current_quantity = max_quantity;
     }
 };
-
+// struct pheromone
+// {
+//     int h_position;
+//     int w_position;
+//     int life_time;
+//     // constructor
+//     pheromone(int height, int weight, int life)
+//     {
+//         h_position = height;
+//         w_position = weight;
+//         life_time = life;
+//     }
+//     void decay_life()
+//     {
+//         life_time = life_time - 1;
+//     }
+//     void increase_life(int time)
+//     {
+//         life_time = life_time + time;
+//     }
+// };
 
