@@ -3,24 +3,25 @@
 #include <random>
 #include <cstdlib>
 #include <string>
+#include <iostream>
 using namespace std;
-
 
 void gotoxy(int x, int y) { printf("%c[%d;%df", 0x1B, y, x); }
 void clrscr(void) { system("clear"); }
 int rand_between(int start, int final)
 {
+    
     std::random_device dev;
     std::mt19937 rng(dev());
     std::uniform_int_distribution<std::mt19937::result_type> dist6(start, final); // distribution in range [1, 6]
+
     return( int(dist6(rng)));
 };
-
-
 
 // Basic structure of the space
 struct space_unit
 {
+
     int ant_number = 0;
     int pheromone_life = 0;
     bool has_food = false;
@@ -42,9 +43,8 @@ struct space_unit
     void set_anthill() { has_anthill = true; }
     void remove_anthill() { has_anthill = false; }
 
-
-    void generate_visualization(){
-
+    void generate_visualization()
+    {
 
         if (has_anthill)
         {
@@ -63,15 +63,10 @@ struct space_unit
         else if (pheromone_life > 0)
         {
             visualization = "\033[1;35m•\033[0m";
-
-
             // visualization = ".";
         }
-        else if ((ant_number > 0))
-        {
-            visualization = "\033[1;31m*\033[0m";
-            // visualization = "*";
-        }
+         // visualization = "*";
+        
         else
         {
             visualization = " ";
@@ -109,7 +104,6 @@ struct space
         }
     };
 
-    //***************************************** CLASS FUNCTIONS ************************************************
     void set_ant_map(int i, int j) { map[i][j].set_ant(); }                   // Set an ant at (i,j) position in the space
     void remove_ant_map(int i, int j) { map[i][j].remove_ant(); }             // Remove an ant at (i,j) position
     void set_pheromone_map(int i, int j, int quantity) { map[i][j].set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
@@ -118,7 +112,6 @@ struct space
     void remove_food_map(int i, int j) { map[i][j].remove_food(); }
     void set_anthill_map(int i, int j) { map[i][j].set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
     void remove_anthill_map(int i, int j) { map[i][j].remove_anthill(); } // Remove an anthill at (i,j) position
-
 
     // //***************************************** Update the terminal //*****************************************
     void show_map()
@@ -146,6 +139,7 @@ struct space
             for (int j = 0; j < width; j++)
             {
                 map[i][j].show();
+                decay_pheromone_map(i,j);
             }
 
             cout << "#";
@@ -161,35 +155,6 @@ struct space
     }
 };
 
-
-// struct pheromone
-// {
-//     int h_position;
-//     int w_position;
-//     int life_time;
-//     space *current_map;
-
-//     // constructor
-//     pheromone(int height, int weight, int life, space *map){
-//         h_position = height;
-//         w_position = weight;
-//         life_time = life;
-//         current_map = map;
-//         (*current_map).set_pheromone_map(h_position,w_position); // create new pheromone
-//     }
-
-//     void decay_life(){
-//         life_time = life_time - 1;
-//     }
-
-//     void increase_life(int time){
-//         life_time = life_time + time;
-//     }
-// };
-
-// // global list of pheromones
-// vector<pheromone> pheromones;
-
 struct ant
 {
 
@@ -197,11 +162,12 @@ struct ant
     int w_position;
     vector<int> home_position;
     int field_of_vision;
-    int pherome_life;
+    int status; // 0: walking around  1:going home  2:following the pheromone trail 3: getting food
     space *current_map;
     int w_direction;
     int h_direction;
     vector<int> food_position;
+    // Indicate fi already saw food
     bool saw_food = false;
     bool going_home = false;
     bool dropping = false;
@@ -213,7 +179,7 @@ struct ant
         w_position = home[1];
         home_position = home;
         field_of_vision = field;
-        pherome_life = phe_time;
+        status = 0;
         
         (*map).set_ant_map(h_position, w_position);
         current_map = map;
@@ -236,9 +202,6 @@ struct ant
         // Rever caso as formigas não vejam as extremidades
         if(w_final>=(*current_map).width){w_final = (*current_map).width-1;}
         if(h_final>=(*current_map).height){h_final = (*current_map).height-1;}
-        // Food sense
-        // cout << "upper corner:" << w_start << "," << h_start << endl;
-        // cout << "upper corner:" << w_final << "," << h_final << endl;
         for (int i = h_start; i <= h_final; i++)
         {
             for (int j = w_start; j <= w_final; j++)
@@ -253,16 +216,18 @@ struct ant
             }
             // cout << endl;
         }
-        return(false);
+        // return(false);
         // (*current_map)
     }
 
     void walk_randomly(){
         // Tem 1/5 de chance da formiga rever a direção que está seguindo
-
-        if(rand_between(1,5)<2){ w_direction = rand_between(1,3)-2;}
-        if(rand_between(1,5)<2){ h_direction = rand_between(1,3)-2;}
-
+        if(rand_between(1,5)<2){
+            w_direction = rand_between(1,3)-2;
+        }
+        if(rand_between(1,5)<2){
+            h_direction = rand_between(1,3)-2;
+        }
         // Removing the old position
         (*current_map).remove_ant_map(h_position, w_position);
 
@@ -277,6 +242,7 @@ struct ant
         
         w_position += w_direction;
         h_position += h_direction;
+        (*current_map).set_ant_map(h_position, w_position);
     }
 
     void go_food(){
@@ -337,11 +303,22 @@ struct ant
     }
 
 
-        // (*current_map).set_pheromone_map(h_position,w_position);
-
-        if (w_position==home_position[1] && h_position==home_position[0]){
-            going_home = false;
+    void move()
+    {
+        see_around();
+        
+        if(saw_food && !dropping){
+            go_food();
         }
+        else if(dropping){
+            go_home();
+        }
+        else{
+            walk_randomly();
+        }
+         if (dropping){
+            drop_pheromone();
+        } 
     }
 
     void drop_pheromone()
@@ -376,7 +353,6 @@ struct anthill
         }
     }
     void ant_moves(){
-        // Aqui entra movimento das sauvas
         for (int i = 0; i < ants_list.size(); i++)
         {
             ants_list[i].move();
