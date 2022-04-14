@@ -20,7 +20,7 @@ int AntsCounter = 0;
 struct ant
 {
 
-     // moving variables
+    // moving variables
     int h_position;
     int w_position;
     int w_direction;
@@ -83,7 +83,7 @@ struct ant
         {
             for (int j = w_start; j <= w_final; j++)
             {
-                if((*current_map).map[i][j].has_food){
+                if((*current_map).map[i][j].has_food()){
                     food_position.push_back(i);
                     food_position.push_back(j);
                     saw_food = true;
@@ -98,7 +98,7 @@ struct ant
         }
         
         if(food_position.size()>0){
-        if(!(*current_map).map[food_position[0]][food_position[1]].has_food ){
+        if(!(*current_map).map[food_position[0]][food_position[1]].has_food() ){
             saw_food = false;
             food_position.clear();
         }}
@@ -291,40 +291,39 @@ struct anthill
 };
 
 // VALE A PENA MANTER ASSIM? MNAO É MELHOR COLOCAR DENTRO DO MAPA?
-struct food
-{
-    int h_position;
-    int w_position;
-    int max_quantity;
-    int current_quantity;
-    space *current_map;
+// struct food
+// {
+//     int h_position;
+//     int w_position;
+//     int max_quantity;
+//     int current_quantity;
+//     space *current_map;
 
 
-    // constructor
-    food(int i, int j, int int_quantity, space *map)
-    {
-        h_position = i;
-        w_position = j;
-        current_quantity = int_quantity;
-        max_quantity = int_quantity;
-        current_map = map;
-        (*current_map).set_food_map(i,j);
-    }
+//     // constructor
+//     food(int i, int j, int int_quantity, space *map)
+//     {
+//         h_position = i;
+//         w_position = j;
+//         current_quantity = int_quantity;
+//         max_quantity = int_quantity;
+//         current_map = map;
+//         (*current_map).set_food_map(i,j);
+//     }
 
-    void update(){
-        for (int i = 0; i < (*current_map).map[h_position][w_position].ant_number; i++)
-        {
-            decay_quantity();
-            if(current_quantity<=0){
-                reset_quantity();
-                break;
-            }
-        }
+//     void update(){
+//         for (int i = 0; i < (*current_map).map[h_position][w_position].ant_number; i++)
+//         {
+//             decay_quantity();
+//             if(current_quantity<=0){
+//                 reset_quantity();
+//                 break;
+//             }
+//         }
         
-    }
+//     }
 
-    void decay_quantity(){current_quantity = current_quantity - 1;}
-    void reset_quantity(){current_quantity = max_quantity;}
+//     void decay_quantity(){current_quantity = current_quantity - 1;}
+//     void reset_quantity(){current_quantity = max_quantity;}
 
-
-};
+// };

@@ -7,6 +7,8 @@
 #include <thread>
 using namespace std;
 
+#include"food.cpp"
+
 // ************************************** MAP STRUCTURES **************************************
 
 
@@ -20,17 +22,16 @@ Tail Structure
  */
 struct space_unit
 {
-
     int ant_number = 0;
     int pheromone_life = 0;
-
-    bool has_food = false;
-    int food_quantity = 0;
 
     bool has_anthill = false;
 
     int w_pheromone_food_direction;
     int h_pheromone_food_direction;
+
+    // bool has_food = false;
+    food *current_food = NULL;
 
     // Visualization of the unit
     string visualization = " ";
@@ -47,13 +48,33 @@ struct space_unit
         if(pheromone_life == 0 ){ h_pheromone_food_direction= 0 ; w_pheromone_food_direction= 0;}
     }
 
-    void set_food() { has_food = true; }
-    void remove_food() { has_food = false; }
+    bool has_food(){
+        if (current_food != NULL){
+            if ((*current_food).current_quantity > 0){
+                return true;
+            }
+        }
+        return false;
+    }
 
+    int view_food(){
+        if (current_food != NULL){
+        return (*current_food).current_quantity;
+        }
+        return 0; // there is no food
+    }
+
+    void set_food(food *pointer){
+         current_food = pointer;
+    }
+
+    food* get_food(){
+         return current_food;
+    }
 
     void generate_visualization(){
         if (has_anthill){visualization = "\033[1;41m \033[0m";}
-        else if (has_food){ visualization = "\033[1;43m \033[0m";}
+        else if (has_food()){ visualization = "\033[1;43m \033[0m";}
         else if (ant_number > 0){ visualization = "\033[1;31m*\033[0m";}  
         else if (pheromone_life > 0){visualization = "\033[1;35m•\033[0m";}
         else{visualization = " ";}
@@ -100,8 +121,8 @@ struct space
     void remove_ant_map(int i, int j) { map[i][j].remove_ant(); }             // Remove an ant at (i,j) position
     void set_pheromone_map(int i, int j, int quantity) { map[i][j].set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
     void decay_pheromone_map(int i, int j) { map[i][j].decay_pheromone(); } // Remove a pheromone at (i,j) position
-    void set_food_map(int i, int j) { map[i][j].set_food(); }                 // Set food to terminal visualization at position (i,j)
-    void remove_food_map(int i, int j) { map[i][j].remove_food(); }
+    // void set_food_map(int i, int j) { map[i][j].set_food(); }                 // Set food to terminal visualization at position (i,j)
+    // void remove_food_map(int i, int j) { map[i][j].remove_food(); }
     void set_anthill_map(int i, int j) { map[i][j].set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
     void remove_anthill_map(int i, int j) { map[i][j].remove_anthill(); } // Remove an anthill at (i,j) position
 
