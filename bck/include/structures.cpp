@@ -5,8 +5,8 @@
 #include <string>
 #include <mutex>
 #include <thread>
-using namespace std;
 
+using namespace std;
 
 mutex AntsCounterMutex;
 int AntsCounter = 0;
@@ -39,9 +39,14 @@ struct space_unit
     // Visualization of the unit
     string visualization = " ";
 
+
+// CRITICAL FUNCTIONS
     void set_ant() { ant_number++; }
+    
     void remove_ant() { ant_number--; }
+    
     void set_pheromone(int quantity) { pheromone_life=quantity ; }
+    
     void decay_pheromone() { 
         if (pheromone_life > 0){   
             pheromone_life--;
@@ -51,9 +56,13 @@ struct space_unit
             w_pheromone_food_direction= 0;
         }
         }
+
     void set_food() { has_food = true; }
+    
     void remove_food() { has_food = false; }
+    
     void set_anthill() { has_anthill = true; }
+    
     void remove_anthill() { has_anthill = false; }
 
     void generate_visualization()
@@ -126,6 +135,7 @@ struct space
     void set_anthill_map(int i, int j) { map[i][j].set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
     void remove_anthill_map(int i, int j) { map[i][j].remove_anthill(); } // Remove an anthill at (i,j) position
 
+
     // //***************************************** Update the terminal //*****************************************
     void show_map()
     {
@@ -175,27 +185,23 @@ struct ant
     int w_position;
     vector<int> home_position;
     int field_of_vision;
-    int status; // 0: walking around  1:going home  2:following the pheromone trail 3: getting food
     space *current_map;
     int w_direction;
     int h_direction;
     vector<int> food_position;
     vector<int> pheromone_position;
-    // Indicate fi already saw food
     bool saw_food = false;
     bool going_home = false;
     bool dropping = false;
     bool following_pheoromone = false;
-    int phe_qnt;
 
 
-    ant(vector<int> home, int field, int pheromone_quantity ,space *map)
+    ant(vector<int> home, int field, space *map)
     {
         h_position = home[0];
         w_position = home[1];
         home_position = home;
         field_of_vision = field;
-        status = 0;
         
         (*map).set_ant_map(h_position, w_position);
         current_map = map;
@@ -203,8 +209,6 @@ struct ant
         // Define the move direction
         w_direction = rand_between(1,3)-2;
         h_direction = rand_between(1,3)-2;
-
-        phe_qnt = pheromone_quantity;
     }
 
     void see_around()
@@ -220,13 +224,13 @@ struct ant
         // Rever caso as formigas não vejam as extremidades
         if(w_final>=(*current_map).width){w_final = (*current_map).width-1;}
         if(h_final>=(*current_map).height){h_final = (*current_map).height-1;}
-        following_pheoromone=false;
-        saw_food = false;
+        
+        
         for (int i = h_start; i <= h_final; i++)
         {
             for (int j = w_start; j <= w_final; j++)
             {
-                // cout << "("<<j<<","<<i<<")";
+            // CRITICAL 
                 if((*current_map).map[i][j].has_food){
                     food_position.push_back(i);
                     food_position.push_back(j);
@@ -238,22 +242,11 @@ struct ant
                     pheromone_position.push_back(j);
                     following_pheoromone = true;
                 }
-                // else{
-                    // Se nao houver nenhum feromonio ao redor para o go_pheoromone
-                    // following_pheoromone = (following_pheoromone||false);
-                // }
-
+            // END CRITICAL     
             }
-            // cout << endl;
         }
-        // Se nao tiver mais comida naquele lugar
-        if(food_position.size()>0){
-        if(!(*current_map).map[food_position[0]][food_position[1]].has_food ){
-            saw_food = false;
-            food_position.clear();
-        }}
-        // return(false);
-        // (*current_map)
+
+
     }
 
     void walk_randomly(){
@@ -278,11 +271,18 @@ struct ant
         
         w_position += w_direction;
         h_position += h_direction;
-        (*current_map).set_ant_map(h_position, w_position);
+
+       
+        (*current_map).set_ant_map(h_position, w_position);  
+
+
     }
 
     void go_food(){
-        (*current_map).remove_ant_map(h_position,w_position);
+        
+        (*current_map).remove_ant_map(h_position,w_position);  
+
+
             h_direction = food_position[0]-h_position;
             w_direction = food_position[1]-w_position;
             if (h_direction>0)
@@ -304,12 +304,13 @@ struct ant
             else{
                 w_position = w_position;
             }
+            (*current_map).set_ant_map(h_position, w_position);
+            
             if(w_position==food_position[1] && h_position==food_position[0]){
                 saw_food = false;
                 dropping = true;
                 food_position.clear();
             }
-            (*current_map).set_ant_map(h_position, w_position);
     }
 
     void go_home()
@@ -336,61 +337,41 @@ struct ant
             h_position+=1;
             (*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;
         }
-        // Armazenando a direçao ate a comida
-        if(w_home_direction<0){(*current_map).map[h_position][w_position].w_pheromone_food_direction = 1;}
-        else if(w_home_direction > 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;}
-        else{(*current_map).map[h_position][w_position].h_pheromone_food_direction = 0;}
-
-        if(h_home_direction < 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = 1;}
-        else if(h_home_direction > 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;}
-        else{(*current_map).map[h_position][w_position].h_pheromone_food_direction = 0;}
+        
         if(h_home_direction==0 && w_home_direction==0){
             dropping = false;
             saw_food = false;
         }
-        (*current_map).set_ant_map(h_position, w_position);
     }
 
     void go_pheromone(){
-        // cout << "Go to pheromone";
         int w_phero_direction = pheromone_position[1]-w_position;
         int h_phero_direction = pheromone_position[0]-h_position;
         (*current_map).remove_ant_map(h_position, w_position);
+        if(w_phero_direction!=0 && h_phero_direction!=0){
 
-        if( (*current_map).map[h_position][w_position].pheromone_life>0){
-                w_position += (*current_map).map[h_position][w_position].w_pheromone_food_direction;
-                h_position += (*current_map).map[h_position][w_position].h_pheromone_food_direction;
-                if((*current_map).map[h_position][w_position].pheromone_life==0){
-                    following_pheoromone = false;
-                }
+        if(w_phero_direction<0){
+            w_position -= 1;
         }
-        else{
-            if(w_phero_direction<0){
-                w_position -= 1;
-            }
-            else if(w_phero_direction>0){
-                w_position += 1;
-            }
-            if(h_phero_direction<0){
-                h_position -= 1;
-            }
-            else if(h_phero_direction>0){
-                h_position += 1;
-            }
-        } 
-        // else {
-        //     following_pheoromone = false;
-        // }
-        //     cout << "cheguei no feromonio" << endl;
-        
-        // }
+        else if(w_phero_direction>0){
+            w_position += 1;
+        }
+        if(h_phero_direction<0){
+            h_position -= 1;
+        }
+        else if(h_phero_direction>0){
+            h_position += 1;
+        }
+        }else{
+            w_position += (*current_map).map[w_position][h_position].w_pheromone_food_direction;
+            h_position += (*current_map).map[w_position][h_position].h_pheromone_food_direction;
+        }
         (*current_map).set_ant_map(h_position, w_position);
     }
 
     void move()
     {
         see_around();
-        // cout << following_pheoromone << endl;
         // (*current_map).remove_ant_map(h_position, w_position);
         if(saw_food && !dropping){
             go_food();
@@ -407,61 +388,70 @@ struct ant
          if (dropping){
             drop_pheromone();
         } 
-        
+        // (*current_map).set_ant_map(h_position, w_position);
     }
 
     void drop_pheromone()
     {
-        (*current_map).set_pheromone_map(h_position,w_position, phe_qnt);
+        int quanity = 100;
+        (*current_map).set_pheromone_map(h_position,w_position, quanity);
     }
 };
 
-void test(){
-    cout << "here" << endl;
-}
-
-
 struct anthill
 {
-    int h_position;
-    int w_position;
+    int h_position;    int w_position;
     vector<ant> ants_list;
+    int id;
     space *current_map;
-    anthill(int i, int j,int number_of_ants, int field_vision, int pheromone_quantity,space *map)
+    anthill(int i, int j, int int_id,int number_of_ants, int field_vision, space *map)
     {
         h_position = i;
         w_position = j;
+        id = int_id;
         current_map = map;
         (*map).set_anthill_map(i,j);
-        spawn_ants(number_of_ants, field_vision,pheromone_quantity);
+        spawn_ants(number_of_ants, field_vision);
     }
     
-    void spawn_ants(int number_of_ants, int ant_field_vision, int pheromone_quantity)
+    void spawn_ants(int number_of_ants, int ant_field_vision)
     {
         for(int i = 0; i < number_of_ants; i++){
-          ant new_ant({h_position,w_position}, ant_field_vision,pheromone_quantity, current_map);
+          ant new_ant({h_position,w_position}, ant_field_vision, current_map);
           ants_list.push_back(new_ant);
         }
     }
 
-    long getNextAnt(){
-        // const lock_guard<std::mutex> lock(AntsCounterMutex);
-        //  cout << "HERE" << endl;
+    int getNextAnt(){
+        const lock_guard<std::mutex> lock(AntsCounterMutex);
         return AntsCounter++;
     }
 
     void ant_moves(){
-        
         int number;
-        do{
-            number = getNextAnt();
-            cout << number << endl;
+        while ((number = getNextAnt()) < ants_list.size()) {
             ants_list[number].move();
-        }
-        while (number <= ants_list.size());
 
+        }
     }
- 
+
+    void RunMultithread(){
+
+        // create threads
+        vector<std::thread*> threadList;
+        threadList.reserve(1);
+        for (int threadInx=0; threadInx < 1; threadInx++) {
+                thread * thread;
+                thread = new std::thread(ant_moves);
+                threadList.push_back(thread);
+        }
+
+        for (std::thread * thread : threadList) {
+            thread->join();
+            delete thread;
+        }
+      
+    }
 
 };
 
@@ -482,6 +472,8 @@ struct food
         current_map = map;
         (*current_map).set_food_map(i,j);
     }
+
+
     void update(){
         // Por enquanto, para cada formiga na posição da comida, há um decréscimo da comida
         for (int i = 0; i < (*current_map).map[h_position][w_position].ant_number; i++)
@@ -489,12 +481,23 @@ struct food
             decay_quantity();
             // Se a comida acabar
             if(current_quantity<=0){
+                
+                // A comida é removida da localização atual
+                // (*current_map).remove_food_map(h_position,w_position);
+
+                // Um nova posição aleatoria é escolhida
+                // h_position = rand_between(1,(*current_map).height-1);
+                // w_position = rand_between(1,(*current_map).width-1);
+                // (*current_map).set_food_map(h_position,w_position);
+                // A quantidade é atualizada
                 reset_quantity();
                 break;
             }
         }
         
     }
+
+
     void decay_quantity()
     {
         current_quantity = current_quantity - 1;
@@ -505,3 +508,4 @@ struct food
         current_quantity = max_quantity;
     }
 };
+
