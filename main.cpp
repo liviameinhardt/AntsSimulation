@@ -10,7 +10,7 @@ int main(int argc, char const *argv[])
 
     // ****************** DEFINE SCENARIO ****************** 
 
-    int NUM_THREADS = 2; // Total number of threads
+    int NUM_THREADS = 1; // Total number of threads
     int map_h = 15; //Map height
     int map_w = 20;//Map Width
     int simulation_time = 1400; //Simulation total time in seconds

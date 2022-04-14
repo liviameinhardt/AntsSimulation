@@ -90,13 +90,13 @@ struct ant
         {
             for (int j = w_start; j <= w_final; j++)
             {
-                if((*current_map).map[i][j].has_food()){
+                if((*current_map).check_food(i,j)){
                     food_position.push_back(i);
                     food_position.push_back(j);
                     saw_food = true;
                 }
 
-                if((*current_map).map[i][j].pheromone_life>0){
+                if((*current_map).check_phe_life(i,j)>0){
                     pheromone_position.push_back(i);
                     pheromone_position.push_back(j);
                     following_pheoromone = true;
@@ -105,7 +105,7 @@ struct ant
         }
         
         if(food_position.size()>0){
-        if(!(*current_map).map[food_position[0]][food_position[1]].has_food() ){
+        if(!(*current_map).check_food(food_position[0],food_position[1]) ){
             saw_food = false;
             food_position.clear();
         }}
@@ -154,7 +154,7 @@ struct ant
             if(w_position==food_position[1] && h_position==food_position[0]){
 
                 // / problema de leitura / escrita
-                if((*current_map).map[food_position[0]][food_position[1]].has_food()){
+                if((*current_map).check_food(food_position[0],food_position[1])){
 
                     FoodMutex.lock();
                     food_pointer = (*current_map).map[food_position[0]][food_position[1]].get_food();
@@ -189,30 +189,30 @@ struct ant
         // Updating position
         if(w_home_direction<0){
             w_position-=1;
-            (*current_map).map[h_position][w_position].w_pheromone_food_direction = 1;
+             (*current_map).set_phe_w_direction(h_position,w_position,1);
         }
         else if(w_home_direction > 0){
             w_position+=1;
-            (*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;
+            (*current_map).set_phe_w_direction(h_position,w_position,-1);
         }
         
         if(h_home_direction < 0){
             h_position-=1;
-            (*current_map).map[h_position][w_position].h_pheromone_food_direction = 1;
+            (*current_map).set_phe_h_direction(h_position,w_position,1);
         }
         else if(h_home_direction > 0){
             h_position+=1;
-            (*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;
+            (*current_map).set_phe_h_direction(h_position,w_position,-1);
         }
 
         // Armazenando a direçao ate a comida
-        if(w_home_direction<0){(*current_map).map[h_position][w_position].w_pheromone_food_direction = 1;}
-        else if(w_home_direction > 0){(*current_map).map[h_position][w_position].w_pheromone_food_direction = -1;}
-        else{(*current_map).map[h_position][w_position].w_pheromone_food_direction = 0;}
+        if(w_home_direction<0){(*current_map).set_phe_w_direction(h_position,w_position,1);}
+        else if(w_home_direction > 0){(*current_map).set_phe_w_direction(h_position,w_position,-1);}
+        else{(*current_map).set_phe_w_direction(h_position,w_position,0);}
 
-        if(h_home_direction < 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = 1;}
-        else if(h_home_direction > 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;}
-        else{(*current_map).map[h_position][w_position].h_pheromone_food_direction = 0;}
+        if(h_home_direction < 0){(*current_map).set_phe_h_direction(h_position,w_position,1);}
+        else if(h_home_direction > 0){(*current_map).set_phe_h_direction(h_position,w_position,-1);}
+        else{(*current_map).set_phe_h_direction(h_position,w_position,0);}
         if(h_home_direction==0 && w_home_direction==0){
             dropping = false;
             saw_food = false;
@@ -231,10 +231,10 @@ struct ant
         // Removing the old position
         (*current_map).remove_ant_map(h_position, w_position);
 
-        if( (*current_map).map[h_position][w_position].pheromone_life>0){
-                w_position += (*current_map).map[h_position][w_position].w_pheromone_food_direction;
-                h_position += (*current_map).map[h_position][w_position].h_pheromone_food_direction;
-                if((*current_map).map[h_position][w_position].pheromone_life==0){
+        if( (*current_map).check_phe_life(h_position,w_position)>0){
+                w_position += (*current_map).w_phe_food_di(h_position,w_position);
+                h_position += (*current_map).h_phe_food_di(h_position,w_position);
+                if((*current_map).check_phe_life(h_position,w_position)==0){
                     following_pheoromone = false;
                 }
         }

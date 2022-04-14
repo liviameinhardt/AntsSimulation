@@ -110,7 +110,7 @@ struct space
         }
     };
 
-
+    // escrita 
     void set_ant_map(int i, int j) { (*check_position(i,j)).set_ant(); }                   // Set an ant at (i,j) position in the space
     void remove_ant_map(int i, int j) { (*check_position(i,j)).remove_ant(); }             // Remove an ant at (i,j) position
     void set_pheromone_map(int i, int j, int quantity) {(*check_position(i,j)).set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
@@ -118,21 +118,25 @@ struct space
     void set_anthill_map(int i, int j) { (*check_position(i,j)).set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
     void remove_anthill_map(int i, int j) { (*check_position(i,j)).remove_anthill(); } // Remove an anthill at (i,j) position
 
+    void set_phe_w_direction(int i, int j, int direction) { (*check_position(i,j)).w_pheromone_food_direction = direction; } // Remove an anthill at (i,j) position
+    void set_phe_h_direction(int i, int j, int direction) { (*check_position(i,j)).w_pheromone_food_direction = direction; } // Remove an anthill at (i,j) position
 
-    // void set_ant_map(int i, int j) { map[i][j].set_ant(); }                   // Set an ant at (i,j) position in the space
-    // void remove_ant_map(int i, int j) { map[i][j].remove_ant(); }             // Remove an ant at (i,j) position
-    // void set_pheromone_map(int i, int j, int quantity) { map[i][j].set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
-    // void decay_pheromone_map(int i, int j) { map[i][j].decay_pheromone(); } // Remove a pheromone at (i,j) position
-    // void set_anthill_map(int i, int j) { map[i][j].set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
-    // void remove_anthill_map(int i, int j) { map[i][j].remove_anthill(); } // Remove an anthill at (i,j) position
+
+    // leitura 
+    bool check_food(int i, int j) { (*check_position(i,j)).has_food(); }    
+    int check_phe_life(int i, int j) { (*check_position(i,j)).pheromone_life; }         
+
+    // void try_get_food(int i, int j) { (*check_position(i,j)).get_food(); }   
+
+    // int w_phe_food_di(int i, int j) { (*check_position(i,j)); }       
+    int h_phe_food_di(int i, int j) { (*check_position(i,j)).h_pheromone_food_direction; } 
+    int w_phe_food_di(int i, int j) { (*check_position(i,j)).w_pheromone_food_direction; } 
 
 
     space_unit* check_position(int i, int j){
         const lock_guard<std::mutex> lock(TailMutex);
         return &(map[i][j]);
     }
-
-    
 
 
     // //***************************************** Update the terminal //*****************************************
