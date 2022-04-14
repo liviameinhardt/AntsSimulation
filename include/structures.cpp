@@ -444,25 +444,22 @@ struct anthill
         }
     }
 
-    long getNextAnt(){
-        // const lock_guard<std::mutex> lock(AntsCounterMutex);
-        //  cout << "HERE" << endl;
+    int getNextAnt(){
+        const lock_guard<std::mutex> lock(AntsCounterMutex);
         return AntsCounter++;
     }
 
     void ant_moves(){
-        
-        int number;
-        do{
-            number = getNextAnt();
-            cout << number << endl;
-            ants_list[number].move();
-        }
-        while (number <= ants_list.size());
 
+        for (int i =0; i < ants_list.size(); i++){
+            ants_list[AntsCounter].move();
+            getNextAnt();
+        }
     }
 
 };
+
+
 
 struct food
 {

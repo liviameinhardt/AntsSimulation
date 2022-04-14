@@ -11,7 +11,7 @@ int main(int argc, char const *argv[])
 
     int NUM_THREADS = 1; //Número de threads a ser utilizada
     int map_h = 15; //Dimensão do mapa altura
-    int map_w = 15;//Dimensão do mapa largura
+    int map_w = 30;//Dimensão do mapa largura
     int simulation_time = 1200; //Tempo da simulação
     int pheromone_timelife = 30; //Tempo de vida de um ferominio (em segundos)
     int ant_field_of_vision = 1; //Campo de visão da formiga
@@ -21,7 +21,7 @@ int main(int argc, char const *argv[])
 
     vector<int> ants_info ={5,ant_field_of_vision}; //only one anthill for now
     vector<int> anthill_position = {0, 0}; //Posição do formigueiro (coluna_indice, linha_indice) e quantidade de formigas 
-    vector<int> food_position = {2, 2};
+    vector<int> food_position = {12, 20};
     
     space map(map_h, map_w);
     anthill sauvas(anthill_position[0],anthill_position[1],number_of_ants,ant_field_of_vision,pheromone_timelife, &map);
@@ -33,23 +33,21 @@ int main(int argc, char const *argv[])
     auto startTime = chrono::steady_clock::now();
 
     do{
-         // create threads
 
-        // vector<std::thread*> threadList;
-        // threadList.reserve(NUM_THREADS);
-        // for (int threadInx=0; threadInx < NUM_THREADS; threadInx++) {
-        //         thread * thread;
-        //         thread = new std::thread(&anthill::ant_moves,&sauvas);
-        //         threadList.push_back(thread);
-        // }
+        AntsCounter = 0; // reset counter
 
-        // for (std::thread * thread : threadList) {
-        //     thread->join();
-        //     delete thread;
-        // }
+        vector<std::thread*> threadList;
+        threadList.reserve(NUM_THREADS);
+        for (int threadInx=0; threadInx < NUM_THREADS; threadInx++) {
+                thread * thread;
+                thread = new std::thread(&anthill::ant_moves,&sauvas);
+                threadList.push_back(thread);
+        }
 
-        sauvas.ant_moves();
-
+        for (std::thread * thread : threadList) {
+            thread->join();
+            delete thread;
+        }
 
         bolo.update();
         map.show_map();
@@ -61,6 +59,5 @@ int main(int argc, char const *argv[])
 
     }while (elapsed <= simulation_time);
 
-    
     return 0;
 }
