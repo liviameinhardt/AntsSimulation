@@ -461,7 +461,6 @@ struct anthill
         while (number <= ants_list.size());
 
     }
- 
 
 };
 
