@@ -276,10 +276,8 @@ struct anthill
     }
 
     int getNextAnt(){
-
         const lock_guard<std::mutex> lock(AntsCounterMutex);
         return AntsCounter++;
-
     }
 
     void ant_moves(){
@@ -292,7 +290,7 @@ struct anthill
 
 };
 
-//// VALE A PENA MANTER ASSIM? MNAO É MELHOR COLOCAR DENTRO DO MAPA?
+// VALE A PENA MANTER ASSIM? MNAO É MELHOR COLOCAR DENTRO DO MAPA?
 struct food
 {
     int h_position;
@@ -312,9 +310,8 @@ struct food
         current_map = map;
         (*current_map).set_food_map(i,j);
     }
-    
+
     void update(){
-        // Por enquanto, para cada formiga na posição da comida, há um decréscimo da comida
         for (int i = 0; i < (*current_map).map[h_position][w_position].ant_number; i++)
         {
             decay_quantity();
@@ -325,13 +322,9 @@ struct food
         }
         
     }
-    void decay_quantity()
-    {
-        current_quantity = current_quantity - 1;
-    }
 
-    void reset_quantity()
-    {
-        current_quantity = max_quantity;
-    }
+    void decay_quantity(){current_quantity = current_quantity - 1;}
+    void reset_quantity(){current_quantity = max_quantity;}
+
+
 };
