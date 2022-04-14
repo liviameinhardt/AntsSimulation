@@ -211,6 +211,8 @@ struct ant
         // Rever caso as formigas não vejam as extremidades
         if(w_final>=(*current_map).width){w_final = (*current_map).width-1;}
         if(h_final>=(*current_map).height){h_final = (*current_map).height-1;}
+        following_pheoromone=false;
+        saw_food = false;
         for (int i = h_start; i <= h_final; i++)
         {
             for (int j = w_start; j <= w_final; j++)
@@ -228,12 +230,19 @@ struct ant
                     following_pheoromone = true;
                 }
                 // else{
-                //     following_pheoromone = false;
+                    // Se nao houver nenhum feromonio ao redor para o go_pheoromone
+                    // following_pheoromone = (following_pheoromone||false);
                 // }
-            }
 
+            }
             // cout << endl;
         }
+        // Se nao tiver mais comida naquele lugar
+        if(food_position.size()>0){
+        if(!(*current_map).map[food_position[0]][food_position[1]].has_food ){
+            saw_food = false;
+            food_position.clear();
+        }}
         // return(false);
         // (*current_map)
     }
@@ -286,13 +295,12 @@ struct ant
             else{
                 w_position = w_position;
             }
-            (*current_map).set_ant_map(h_position, w_position);
-            
             if(w_position==food_position[1] && h_position==food_position[0]){
                 saw_food = false;
                 dropping = true;
                 food_position.clear();
             }
+            (*current_map).set_ant_map(h_position, w_position);
     }
 
     void go_home()
@@ -319,42 +327,64 @@ struct ant
             h_position+=1;
             (*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;
         }
-        
+        // Armazenando a direçao ate a comida
+        if(w_home_direction<0){(*current_map).map[h_position][w_position].w_pheromone_food_direction = 1;}
+        else if(w_home_direction > 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;}
+        else{(*current_map).map[h_position][w_position].h_pheromone_food_direction = 0;}
+
+        if(h_home_direction < 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = 1;}
+        else if(h_home_direction > 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;}
+        else{(*current_map).map[h_position][w_position].h_pheromone_food_direction = 0;}
         if(h_home_direction==0 && w_home_direction==0){
             dropping = false;
             saw_food = false;
         }
+        (*current_map).set_ant_map(h_position, w_position);
     }
 
     void go_pheromone(){
-        cout << "Go to pheromone" << endl;
+        // cout << "Go to pheromone";
         int w_phero_direction = pheromone_position[1]-w_position;
         int h_phero_direction = pheromone_position[0]-h_position;
         (*current_map).remove_ant_map(h_position, w_position);
-        if(w_phero_direction!=0 && h_phero_direction!=0){
 
-        if(w_phero_direction<0){
-            w_position -= 1;
+        if( (*current_map).map[h_position][w_position].pheromone_life>0){
+            cout << "aqui no feromonio" << endl;
+                w_position += (*current_map).map[h_position][w_position].w_pheromone_food_direction;
+                h_position += (*current_map).map[h_position][w_position].h_pheromone_food_direction;
+                if((*current_map).map[h_position][w_position].pheromone_life==0){
+                    following_pheoromone = false;
+                    cout << "nao tem caminho" << endl;
+                }
         }
-        else if(w_phero_direction>0){
-            w_position += 1;
-        }
-        if(h_phero_direction<0){
-            h_position -= 1;
-        }
-        else if(h_phero_direction>0){
-            h_position += 1;
-        }
-        }else{
-            w_position += (*current_map).map[w_position][h_position].w_pheromone_food_direction;
-            h_position += (*current_map).map[w_position][h_position].h_pheromone_food_direction;
-        }
+        else{
+            cout << "Indo ate feromonio" << endl;
+            if(w_phero_direction<0){
+                w_position -= 1;
+            }
+            else if(w_phero_direction>0){
+                w_position += 1;
+            }
+            if(h_phero_direction<0){
+                h_position -= 1;
+            }
+            else if(h_phero_direction>0){
+                h_position += 1;
+            }
+        } 
+        // else {
+        //     following_pheoromone = false;
+        // }
+        //     cout << "cheguei no feromonio" << endl;
+        
+        // }
         (*current_map).set_ant_map(h_position, w_position);
     }
 
     void move()
     {
         see_around();
+        // cout << following_pheoromone << endl;
         // (*current_map).remove_ant_map(h_position, w_position);
         if(saw_food && !dropping){
             go_food();
@@ -364,6 +394,7 @@ struct ant
         }
         else if(following_pheoromone){
             go_pheromone();
+            cout << "to aqui" << endl;
         }
         else{
             walk_randomly();
@@ -371,12 +402,12 @@ struct ant
          if (dropping){
             drop_pheromone();
         } 
-        // (*current_map).set_ant_map(h_position, w_position);
+        
     }
 
     void drop_pheromone()
     {
-        int quanity = 100;
+        int quanity = 50;
         (*current_map).set_pheromone_map(h_position,w_position, quanity);
     }
 };
@@ -463,25 +494,3 @@ struct food
         current_quantity = max_quantity;
     }
 };
-// struct pheromone
-// {
-//     int h_position;
-//     int w_position;
-//     int life_time;
-//     // constructor
-//     pheromone(int height, int weight, int life)
-//     {
-//         h_position = height;
-//         w_position = weight;
-//         life_time = life;
-//     }
-//     void decay_life()
-//     {
-//         life_time = life_time - 1;
-//     }
-//     void increase_life(int time)
-//     {
-//         life_time = life_time + time;
-//     }
-// };
-
