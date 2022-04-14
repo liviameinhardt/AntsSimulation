@@ -10,19 +10,19 @@ int main(int argc, char const *argv[])
 
     // ****************** DEFINE SCENARIO ****************** 
 
-    int NUM_THREADS = 1; // Total number of threads
+    int NUM_THREADS = 2; // Total number of threads
     int map_h = 15; //Map height
-    int map_w = 30;//Map Width
+    int map_w = 20;//Map Width
     int simulation_time = 1400; //Simulation total time in seconds
     int pheromone_timelife = 30; //Pheromone time life (in simulation time unit)
     int ant_field_of_vision = 1; //Ant field of vision
     int max_ants_food = 5; //Number max of ants that can collect food 
     int number_of_ants = 10; // Total number of Ants
-    int food_quantity = 100;  // Total food quantity
+    int food_quantity = 3;  // Total food quantity
     int rep_rate = 1; // Food replacement Rate
 
     vector<int> anthill_position = {0, 0}; //Anthill position vector indicates (height, width)
-    vector<int> food_position = {10, 20}; //Food position vector indicates (height, width)
+    vector<int> food_position = {10, 15}; //Food position vector indicates (height, width)
 
 
     // ****************** INICIALIZATE ******************
@@ -38,7 +38,7 @@ int main(int argc, char const *argv[])
     long long elapsed = 0;
     auto startTime = chrono::steady_clock::now();
 
-    // ****************** MULTI THREAD ******************
+    // ****************** MULTI THREAD *****************
 
  
     do{

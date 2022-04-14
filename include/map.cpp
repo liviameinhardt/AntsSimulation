@@ -10,12 +10,12 @@ using namespace std;
 #include"food.cpp"
 
 // ************************************** MAP STRUCTURES **************************************
-
-
 // visualization auxiliar functions
 void gotoxy(int x, int y) { printf("%c[%d;%df", 0x1B, y, x); }
 void clrscr(void) { system("clear"); }
 
+// tail mutex
+mutex TailMutex; 
 
 /* 
 Tail Structure 
@@ -55,13 +55,6 @@ struct space_unit
             }
         }
         return false;
-    }
-
-    int view_food(){
-        if (current_food != NULL){
-        return (*current_food).current_quantity;
-        }
-        return 0; // there is no food
     }
 
     void set_food(food *pointer){
@@ -117,14 +110,30 @@ struct space
         }
     };
 
-    void set_ant_map(int i, int j) { map[i][j].set_ant(); }                   // Set an ant at (i,j) position in the space
-    void remove_ant_map(int i, int j) { map[i][j].remove_ant(); }             // Remove an ant at (i,j) position
-    void set_pheromone_map(int i, int j, int quantity) { map[i][j].set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
-    void decay_pheromone_map(int i, int j) { map[i][j].decay_pheromone(); } // Remove a pheromone at (i,j) position
-    // void set_food_map(int i, int j) { map[i][j].set_food(); }                 // Set food to terminal visualization at position (i,j)
-    // void remove_food_map(int i, int j) { map[i][j].remove_food(); }
-    void set_anthill_map(int i, int j) { map[i][j].set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
-    void remove_anthill_map(int i, int j) { map[i][j].remove_anthill(); } // Remove an anthill at (i,j) position
+
+    void set_ant_map(int i, int j) { (*check_position(i,j)).set_ant(); }                   // Set an ant at (i,j) position in the space
+    void remove_ant_map(int i, int j) { (*check_position(i,j)).remove_ant(); }             // Remove an ant at (i,j) position
+    void set_pheromone_map(int i, int j, int quantity) {(*check_position(i,j)).set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
+    void decay_pheromone_map(int i, int j) { (*check_position(i,j)).decay_pheromone(); } // Remove a pheromone at (i,j) position
+    void set_anthill_map(int i, int j) { (*check_position(i,j)).set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
+    void remove_anthill_map(int i, int j) { (*check_position(i,j)).remove_anthill(); } // Remove an anthill at (i,j) position
+
+
+    // void set_ant_map(int i, int j) { map[i][j].set_ant(); }                   // Set an ant at (i,j) position in the space
+    // void remove_ant_map(int i, int j) { map[i][j].remove_ant(); }             // Remove an ant at (i,j) position
+    // void set_pheromone_map(int i, int j, int quantity) { map[i][j].set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
+    // void decay_pheromone_map(int i, int j) { map[i][j].decay_pheromone(); } // Remove a pheromone at (i,j) position
+    // void set_anthill_map(int i, int j) { map[i][j].set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
+    // void remove_anthill_map(int i, int j) { map[i][j].remove_anthill(); } // Remove an anthill at (i,j) position
+
+
+    space_unit* check_position(int i, int j){
+        const lock_guard<std::mutex> lock(TailMutex);
+        return &(map[i][j]);
+    }
+
+    
+
 
     // //***************************************** Update the terminal //*****************************************
     void show_map(){

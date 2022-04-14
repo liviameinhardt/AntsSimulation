@@ -15,6 +15,10 @@ int rand_between(int start, int final){
 mutex AntsCounterMutex; 
 int AntsCounter = 0; 
 
+// food mutex
+mutex FoodMutex; 
+
+
 // ************************************** ANTS, ANTHILL AND FOOD **************************************
 
 struct ant
@@ -40,6 +44,7 @@ struct ant
     bool following_pheoromone = false;
 
     space *current_map; // pointer to map
+    food *food_pointer = NULL; // pointer to food
 
 
     ant(vector<int> home, int field, int pheromone_quantity ,space *map)
@@ -57,6 +62,8 @@ struct ant
         
         current_map = map;
         (*current_map).set_ant_map(h_position, w_position);
+
+        
        
     }
 
@@ -145,9 +152,23 @@ struct ant
             else{w_position = w_position;}
 
             if(w_position==food_position[1] && h_position==food_position[0]){
+
+                // / problema de leitura / escrita
+                if((*current_map).map[food_position[0]][food_position[1]].has_food()){
+
+                    FoodMutex.lock();
+                    food_pointer = (*current_map).map[food_position[0]][food_position[1]].get_food();
+                    (*food_pointer).decay_quantity();
+                    FoodMutex.unlock();
+
+
+                }
+
                 saw_food = false;
                 dropping = true;
                 food_position.clear();
+            
+        
             }
 
             // New position
@@ -186,8 +207,8 @@ struct ant
 
         // Armazenando a direçao ate a comida
         if(w_home_direction<0){(*current_map).map[h_position][w_position].w_pheromone_food_direction = 1;}
-        else if(w_home_direction > 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;}
-        else{(*current_map).map[h_position][w_position].h_pheromone_food_direction = 0;}
+        else if(w_home_direction > 0){(*current_map).map[h_position][w_position].w_pheromone_food_direction = -1;}
+        else{(*current_map).map[h_position][w_position].w_pheromone_food_direction = 0;}
 
         if(h_home_direction < 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = 1;}
         else if(h_home_direction > 0){(*current_map).map[h_position][w_position].h_pheromone_food_direction = -1;}
@@ -289,41 +310,3 @@ struct anthill
     }
 
 };
-
-// VALE A PENA MANTER ASSIM? MNAO É MELHOR COLOCAR DENTRO DO MAPA?
-// struct food
-// {
-//     int h_position;
-//     int w_position;
-//     int max_quantity;
-//     int current_quantity;
-//     space *current_map;
-
-
-//     // constructor
-//     food(int i, int j, int int_quantity, space *map)
-//     {
-//         h_position = i;
-//         w_position = j;
-//         current_quantity = int_quantity;
-//         max_quantity = int_quantity;
-//         current_map = map;
-//         (*current_map).set_food_map(i,j);
-//     }
-
-//     void update(){
-//         for (int i = 0; i < (*current_map).map[h_position][w_position].ant_number; i++)
-//         {
-//             decay_quantity();
-//             if(current_quantity<=0){
-//                 reset_quantity();
-//                 break;
-//             }
-//         }
-        
-//     }
-
-//     void decay_quantity(){current_quantity = current_quantity - 1;}
-//     void reset_quantity(){current_quantity = max_quantity;}
-
-// };
