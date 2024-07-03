@@ -17,7 +17,7 @@ int AntsCounter = 0;
 
 // food mutex
 mutex FoodMutex; 
-
+mutex MoveMutex;
 
 // ************************************** ANTS, ANTHILL AND FOOD **************************************
 
@@ -84,19 +84,22 @@ struct ant
 
         following_pheoromone=false;
         saw_food = false;
-
+        // cout << "olhando ao redor" << endl;
 
         for (int i = h_start; i <= h_final; i++)
         {
             for (int j = w_start; j <= w_final; j++)
-            {
+            {   
+                cout << " " << endl;
                 if((*current_map).check_food(i,j)){
+                    // cout << "Verificando comida" << endl;
                     food_position.push_back(i);
                     food_position.push_back(j);
                     saw_food = true;
                 }
 
                 if((*current_map).check_phe_life(i,j)>0){
+                    // cout << "Verificando feromonio" << endl;
                     pheromone_position.push_back(i);
                     pheromone_position.push_back(j);
                     following_pheoromone = true;
@@ -106,19 +109,22 @@ struct ant
         
         if(food_position.size()>0){
         if(!(*current_map).check_food(food_position[0],food_position[1]) ){
+            // cout << "Verificando comida" << endl;
             saw_food = false;
             food_position.clear();
         }}
     }
 
     void walk_randomly(){
-
+        // cout << "walk_randomly" << endl;
         // Change direction with probability 1/5
         if(rand_between(1,5)<2){ w_direction = rand_between(1,3)-2;}
         if(rand_between(1,5)<2){h_direction = rand_between(1,3)-2;}
 
+        // cout << "será?" << endl;
         // Removing the old position
         (*current_map).remove_ant_map(h_position, w_position);
+        // cout << "talvez hein" << endl;
 
         // if touch the wall change the direction
         if((w_position+w_direction)>=(*current_map).width || (w_position+w_direction)<0){
@@ -130,16 +136,19 @@ struct ant
         // New position
         w_position += w_direction;
         h_position += h_direction;
+        // cout << "quem sabe?" << endl;
+
         (*current_map).set_ant_map(h_position, w_position);
+        // cout << "hm..." << endl;
         
     }
 
 
     void go_food(){
-
+            // cout  << "go_food" << endl;
             // Removing the old position
             (*current_map).remove_ant_map(h_position,w_position);
-
+            // cout << "go_fo" << endl;
             // follow the food
             h_direction = food_position[0]-h_position;
             w_direction = food_position[1]-w_position;
@@ -153,31 +162,28 @@ struct ant
 
             if(w_position==food_position[1] && h_position==food_position[0]){
 
+                // FoodMutex.lock();
                 // / problema de leitura / escrita
                 if((*current_map).check_food(food_position[0],food_position[1])){
 
-                    FoodMutex.lock();
+                    
                     food_pointer = (*current_map).map[food_position[0]][food_position[1]].get_food();
                     (*food_pointer).decay_quantity();
-                    FoodMutex.unlock();
-
-
                 }
 
                 saw_food = false;
                 dropping = true;
                 food_position.clear();
-            
-        
             }
 
             // New position
             (*current_map).set_ant_map(h_position, w_position);
+            
     }
 
 
     void go_home(){
-
+        // cout << "go_home" << endl;
         // follow home position
         int w_home_direction = home_position[1]-w_position; 
         int h_home_direction = home_position[0]-h_position;
@@ -223,7 +229,7 @@ struct ant
     }
 
     void go_pheromone(){
-
+        // cout << "go_pheromone" << endl;
         // Follow pheromone
         int w_phero_direction = pheromone_position[1]-w_position;
         int h_phero_direction = pheromone_position[0]-h_position;
@@ -231,18 +237,29 @@ struct ant
         // Removing the old position
         (*current_map).remove_ant_map(h_position, w_position);
 
+        // cout << "Aqui" << endl;
         if( (*current_map).check_phe_life(h_position,w_position)>0){
+                // cout << "Aqui onde?" << endl;
                 w_position += (*current_map).w_phe_food_di(h_position,w_position);
+                // cout << "Cade" << endl;
                 h_position += (*current_map).h_phe_food_di(h_position,w_position);
                 if((*current_map).check_phe_life(h_position,w_position)==0){
                     following_pheoromone = false;
                 }
         }
         else{
-            if(w_phero_direction<0){ w_position -= 1;}
-            else if(w_phero_direction>0){ w_position += 1;}
-            if(h_phero_direction<0){h_position -= 1;}
-            else if(h_phero_direction>0){h_position += 1;}
+            if(w_phero_direction<0){ 
+                w_position -= 1;
+            }
+            else if(w_phero_direction>0){ 
+                w_position += 1;
+            }
+            if(h_phero_direction<0){
+                h_position -= 1;
+            }
+            else if(h_phero_direction>0){
+                h_position += 1;
+            }
         } 
         
         // New position        
@@ -250,15 +267,35 @@ struct ant
     }
 
     void move(){
-
-        see_around();
-
-        if(saw_food && !dropping){ go_food(); }
-        else if(dropping){ go_home();}
-        else if(following_pheoromone){ go_pheromone();}
-        else{walk_randomly();}
-        if (dropping){drop_pheromone();} 
         
+        // MoveMutex.lock();
+        see_around();
+        // MoveMutex.unlock();
+        // walk_randomly();
+        if(saw_food && !dropping){ 
+            MoveMutex.lock();
+            go_food(); 
+            MoveMutex.unlock();
+        }
+        else if(dropping){ 
+            MoveMutex.lock();
+            go_home();
+            MoveMutex.unlock();}
+        else if(following_pheoromone){ 
+            MoveMutex.lock();
+            go_pheromone();
+            MoveMutex.unlock();
+        }
+        else{
+            MoveMutex.lock();
+            walk_randomly();
+            MoveMutex.unlock();
+        }
+        if (dropping){
+            MoveMutex.lock();
+            drop_pheromone();
+            MoveMutex.unlock();
+        } 
     }
 
     void drop_pheromone(){
@@ -300,13 +337,22 @@ struct anthill
         const lock_guard<std::mutex> lock(AntsCounterMutex);
         return AntsCounter++;
     }
-
+    // backup
+    // void ant_moves(){
+        
+    //     for (int i =0; i < ants_list.size(); i++){
+    //         ants_list[AntsCounter].move();
+    //         getNextAnt();
+    //     }
+    // }
+    
     void ant_moves(){
-
-        for (int i =0; i < ants_list.size(); i++){
-            ants_list[AntsCounter].move();
-            getNextAnt();
+        int block_size = ants_list.size()/6;
+        for (int i =block_size*AntsCounter; i < block_size*AntsCounter+block_size; i++){
+            ants_list[i].move();    
         }
+        getNextAnt();    
+        // cout << NUM_THREADS << endl;
     }
 
 };

@@ -7,7 +7,7 @@
 #include <thread>
 using namespace std;
 
-#include"food.cpp"
+#include "food.cpp"
 
 // ************************************** MAP STRUCTURES **************************************
 // visualization auxiliar functions
@@ -15,10 +15,10 @@ void gotoxy(int x, int y) { printf("%c[%d;%df", 0x1B, y, x); }
 void clrscr(void) { system("clear"); }
 
 // tail mutex
-mutex TailMutex; 
+mutex TailMutex;
 
-/* 
-Tail Structure 
+/*
+Tail Structure
  */
 struct space_unit
 {
@@ -42,48 +42,69 @@ struct space_unit
     void set_anthill() { has_anthill = true; }
     void remove_anthill() { has_anthill = false; }
 
-    void set_pheromone(int quantity) { pheromone_life=quantity ; }
-    void decay_pheromone() { 
-        if (pheromone_life > 0){   pheromone_life--;}
-        if(pheromone_life == 0 ){ h_pheromone_food_direction= 0 ; w_pheromone_food_direction= 0;}
+    void set_pheromone(int quantity) { pheromone_life = quantity; }
+    void decay_pheromone()
+    {
+        if (pheromone_life > 0)
+        {
+            pheromone_life--;
+        }
+        if (pheromone_life == 0)
+        {
+            h_pheromone_food_direction = 0;
+            w_pheromone_food_direction = 0;
+        }
     }
 
-    bool has_food(){
-        if (current_food != NULL){
-            if ((*current_food).current_quantity > 0){
+    bool has_food()
+    {
+        if (current_food != NULL)
+        {
+            if ((*current_food).current_quantity > 0)
+            {
                 return true;
             }
         }
         return false;
     }
 
-    void set_food(food *pointer){
-         current_food = pointer;
+    void set_food(food *pointer)
+    {
+        current_food = pointer;
     }
 
-    food* get_food(){
-         return current_food;
+    food *get_food()
+    {
+        return current_food;
     }
 
-    void generate_visualization(){
-        if (has_anthill){visualization = "\033[1;41m \033[0m";}
-        else if (has_food()){ visualization = "\033[1;43m \033[0m";}
-        else if (ant_number > 0){ visualization = "\033[1;31m*\033[0m";}  
-        else if (pheromone_life > 0){visualization = "\033[1;35m•\033[0m";}
-        else{visualization = " ";}
+    void generate_visualization()
+    {
+        if (has_anthill){
+            visualization = "\033[1;41m \033[0m";
+        }
+        else if (has_food()){
+            visualization = "\033[1;43m \033[0m";
+        }
+        else if (ant_number > 0){
+            visualization = "\033[1;31m*\033[0m";
+        }
+        else if (pheromone_life > 0){
+            visualization = "\033[1;35m•\033[0m";
+        }
+        else{
+            visualization = " ";
+        }
     }
 
-    void show(){
+    void show()
+    {
         this->generate_visualization();
         cout << visualization;
     }
-
 };
 
-
-
-
-/* 
+/*
 Space Structure
  */
 struct space
@@ -110,37 +131,99 @@ struct space
         }
     };
 
-    // escrita 
-    void set_ant_map(int i, int j) { (*check_position(i,j)).set_ant(); }                   // Set an ant at (i,j) position in the space
-    void remove_ant_map(int i, int j) { (*check_position(i,j)).remove_ant(); }             // Remove an ant at (i,j) position
-    void set_pheromone_map(int i, int j, int quantity) {(*check_position(i,j)).set_pheromone(quantity); }       // Set pheromone to terminal visualizationat position (i,j)
-    void decay_pheromone_map(int i, int j) { (*check_position(i,j)).decay_pheromone(); } // Remove a pheromone at (i,j) position
-    void set_anthill_map(int i, int j) { (*check_position(i,j)).set_anthill(); }       // Set anthill to terminal visualization at position (i,j)
-    void remove_anthill_map(int i, int j) { (*check_position(i,j)).remove_anthill(); } // Remove an anthill at (i,j) position
+    // escrita
+    void set_ant_map(int i, int j)
+    {
+        TailMutex.lock();
+        // const lock_guard<std::mutex> lock(TailMutex);
+        (*check_position(i, j)).set_ant();
+        TailMutex.unlock();
+    } // Set an ant at (i,j) position in the space
+    void remove_ant_map(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        TailMutex.lock();
+        (*check_position(i, j)).remove_ant();
+        TailMutex.unlock();
+        // delete (check_position(i, j));
+    } // Remove an ant at (i,j) position
+    void set_pheromone_map(int i, int j, int quantity)
+    {
+        TailMutex.lock();
+        // const lock_guard<std::mutex> lock(TailMutex);
+        (*check_position(i, j)).set_pheromone(quantity);
+        TailMutex.unlock();
+    } // Set pheromone to terminal visualizationat position (i,j)
+    void decay_pheromone_map(int i, int j)
+    {
+        TailMutex.lock();
+        // const lock_guard<std::mutex> lock(TailMutex);
+        (*check_position(i, j)).decay_pheromone();
+        TailMutex.unlock();
+    } // Remove a pheromone at (i,j) position
+    void set_anthill_map(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        (*check_position(i, j)).set_anthill();
+    } // Set anthill to terminal visualization at position (i,j)
+    void remove_anthill_map(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        (*check_position(i, j)).remove_anthill();
+    } // Remove an anthill at (i,j) position
 
-    void set_phe_w_direction(int i, int j, int direction) { (*check_position(i,j)).w_pheromone_food_direction = direction; } // Remove an anthill at (i,j) position
-    void set_phe_h_direction(int i, int j, int direction) { (*check_position(i,j)).w_pheromone_food_direction = direction; } // Remove an anthill at (i,j) position
+    void set_phe_w_direction(int i, int j, int direction)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        (*check_position(i, j)).w_pheromone_food_direction = direction;
+    } // Remove an anthill at (i,j) position
+    void set_phe_h_direction(int i, int j, int direction)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        (*check_position(i, j)).w_pheromone_food_direction = direction;
+    } // Remove an anthill at (i,j) position
 
+    // leitura
+    bool check_food(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        TailMutex.lock();
+        bool out = (*check_position(i, j)).has_food();
+        TailMutex.unlock();
+        return out;
+    }
+    int check_phe_life(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        TailMutex.lock();
+        bool out = (*check_position(i, j)).pheromone_life;
+        TailMutex.unlock();
+        return out;
+    }
 
-    // leitura 
-    bool check_food(int i, int j) { (*check_position(i,j)).has_food(); }    
-    int check_phe_life(int i, int j) { (*check_position(i,j)).pheromone_life; }         
+    // void try_get_food(int i, int j) { (*check_position(i,j)).get_food(); }
 
-    // void try_get_food(int i, int j) { (*check_position(i,j)).get_food(); }   
+    // int w_phe_food_di(int i, int j) { (*check_position(i,j)); }
+    int h_phe_food_di(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        return (*check_position(i, j)).h_pheromone_food_direction;
+    }
+    int w_phe_food_di(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
+        return (*check_position(i, j)).w_pheromone_food_direction;
+    }
 
-    // int w_phe_food_di(int i, int j) { (*check_position(i,j)); }       
-    int h_phe_food_di(int i, int j) { (*check_position(i,j)).h_pheromone_food_direction; } 
-    int w_phe_food_di(int i, int j) { (*check_position(i,j)).w_pheromone_food_direction; } 
-
-
-    space_unit* check_position(int i, int j){
-        const lock_guard<std::mutex> lock(TailMutex);
+    space_unit *check_position(int i, int j)
+    {
+        // const lock_guard<std::mutex> lock(TailMutex);
         return &(map[i][j]);
     }
 
-
     // //***************************************** Update the terminal //*****************************************
-    void show_map(){
+    void show_map()
+    {
 
         // Lines to clear the teminal
         int x = 0, y = 10;
@@ -164,7 +247,7 @@ struct space
             for (int j = 0; j < width; j++)
             {
                 map[i][j].show();
-                decay_pheromone_map(i,j);
+                decay_pheromone_map(i, j);
             }
 
             cout << "#";
