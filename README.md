@@ -32,7 +32,7 @@ Here is an example scenario showing which attributes can be defined:
 
 The figure bellow illustrates the implementation created to solve the problem using multiprocessing concepts. The SPACE structure manages the simulation by controlling each TAIL (implemented in the SPACE MAP structure). It stores a matrix of space map objects and controls reading and writing in these spaces. In this version, the reading and writing problem was solved using only mutex.
 
-![model](annotations/model.png)
+![model](notes/model.png)
 
 The space unit mentioned next stores which element is present in that space unit. This storage is different for each type of element. In the case of pheromone, the structure also handles the decrement and restart of its quantities - depending on the simulation conditions - and stores the direction it points to (towards the food). This way, the ant always follows the expected direction when there is a pheromone in its field of view. For food, a pointer is stored so that the ants can directly access and modify the object.
 
